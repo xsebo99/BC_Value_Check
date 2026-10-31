@@ -33,6 +33,9 @@
   --signalgruen-hauch: #e3f2ea;
   --bahncard: #1c212a;
   --bahncard-text: #ffffff;
+  /* Leuchtfarben auf dunklen Fallblättern (gleiche Töne wie Grün/Rot im Dark Mode) */
+  --tafel-gruen: #3fc883;
+  --tafel-rot: #ff4c56;
   --schatten-flaeche: 0 0 0 1px rgba(20, 25, 32, .05), 0 1px 2px rgba(20, 25, 32, .04), 0 6px 18px -8px rgba(20, 25, 32, .10);
   --schatten-karte: 0 1px 1px rgba(16, 20, 28, .06), 0 12px 28px -8px rgba(16, 20, 28, .28), 0 30px 60px -30px rgba(16, 20, 28, .35);
   --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
@@ -109,11 +112,24 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .eyebrow {
   margin: 0 0 16px; font: 600 var(--t-meta)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--verkehrsrot-text);
 }
-/* Hero: wechselnde Kartennummer */
+/* Fallblatt wie am Bahnsteig: jede Zelle ein Blatt mit Mittelfuge */
 .nowrap { white-space: nowrap; }
-.wechsel { display: inline-block; color: var(--verkehrsrot); font-variant-numeric: tabular-nums; transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
-.wechsel.is-raus { opacity: 0; transform: translateY(-.25em); }
-.wechsel.is-rein { opacity: 0; transform: translateY(.25em); transition: none; }
+.flap { display: inline-flex; gap: .08em; font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+.flap__z {
+  position: relative; display: inline-grid; place-items: center; width: .78em; height: 1.32em;
+  border-radius: .14em; color: #f4f5f7; font-weight: 700; font-stretch: 80%; line-height: 1;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bahncard), #fff 9%) 50%, color-mix(in srgb, var(--bahncard), #fff 4%) 50%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .35);
+  transform-origin: center;
+}
+.flap__z::after { /* Fuge zwischen oberem und unterem Blatt */
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0, 0, 0, .55);
+}
+.flap[data-ton="plus"] .flap__z { color: var(--tafel-gruen); }
+.flap[data-ton="minus"] .flap__z { color: var(--tafel-rot); }
+/* Im Titel: große Blätter, Ziffer in Verkehrsrot als Echo des Logos */
+.flap--titel { gap: .045em; margin-left: .1em; vertical-align: .04em; }
+.flap--titel .flap__z { width: .6em; height: 1.04em; border-radius: .07em; font-stretch: 78%; font-weight: 800; color: var(--tafel-rot); letter-spacing: 0; }
 .display {
   font-family: var(--font-display); font-stretch: 78%; font-weight: 800;
   font-size: var(--t-display); line-height: .98; letter-spacing: -.02em; margin-bottom: 24px;
@@ -159,8 +175,52 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .hero__trust { margin-top: 20px; }
 .has-ext .no-ext, body:not(.has-ext) .ext-only { display: none; }
 .hero__trust + .hero__trust { margin-top: 6px; }
-.hero__card { perspective: 1200px; }
-.hero__card .bc { transform: rotate(-4deg); max-width: 440px; margin-left: auto; }
+.hero__card { perspective: 1200px; display: grid; gap: 40px; justify-items: end; }
+.hero__tilt {
+  width: 100%; max-width: 440px; transform-style: preserve-3d;
+  transform: rotate(-4deg) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 500ms var(--ease);
+}
+.hero__tilt.is-aktiv { transition-duration: 120ms; }
+
+/* Hero-Karte: Musterkarte mit Chip, Nummer und Glanz */
+.bc--hero { grid-template-rows: auto 1fr auto auto; row-gap: 4px; }
+.bc--hero .bc__fill::after { width: 2px; box-shadow: 0 0 18px 6px rgba(255, 255, 255, .22); }
+.bc__glanz {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at var(--gx, 22%) var(--gy, 12%), rgba(255, 255, 255, .55), transparent 52%),
+    linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, .16) 48%, transparent 58%);
+}
+.bc__top .bc__klasse { margin-left: auto; font-family: var(--font-text); font-size: clamp(.7rem, 1.3vw, .8rem); font-weight: 600; opacity: .8; }
+.bc__mitte { display: flex; align-items: center; gap: 7%; }
+.bc__chip {
+  flex: none; width: 15%; aspect-ratio: 1.3; border-radius: 18%;
+  background:
+    linear-gradient(to right, transparent 32%, rgba(0, 0, 0, .22) 32% 34%, transparent 34% 66%, rgba(0, 0, 0, .22) 66% 68%, transparent 68%),
+    linear-gradient(to bottom, transparent 48%, rgba(0, 0, 0, .22) 48% 52%, transparent 52%),
+    linear-gradient(135deg, #e9ebee, #a4abb5 45%, #dfe2e6 70%, #9aa1ab);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+}
+.bc--hero .bc__amount { font-size: clamp(2.1rem, 5.4vw, 3.7rem); transition: opacity 200ms var(--ease); }
+.bc__sub { margin-top: 4px; font-family: var(--font-text); font-size: clamp(.7rem, 1.3vw, .82rem); opacity: .85; font-variant-numeric: tabular-nums; }
+.bc__nr {
+  font-weight: 600; font-stretch: 100%; letter-spacing: .14em; font-size: clamp(.78rem, 1.6vw, 1.02rem); font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 -1px 0 rgba(255, 255, 255, .12);
+}
+.bc--hero .bc__bottom { text-transform: uppercase; letter-spacing: .08em; font-size: clamp(.62rem, 1.15vw, .74rem); }
+
+/* Abfahrtstafel unter der Karte */
+.tafel {
+  width: 100%; max-width: 440px; display: flex; justify-content: space-between; gap: 10px;
+  padding: 12px 14px 14px; border-radius: var(--r-element);
+  background: color-mix(in srgb, var(--bahncard), #000 35%); box-shadow: var(--schatten-karte);
+  font-size: clamp(.86rem, 1.45vw, 1.06rem);
+}
+.tafel__feld { display: grid; gap: 6px; }
+.tafel__feld--rechts { justify-items: end; }
+.tafel__label { font: 600 10px/1 var(--font-text); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .5); }
+.tafel .flap { gap: 2px; }
 
 /* Die BahnCard – Signatur der Seite: die Karte füllt sich mit der Ersparnis bis zum Kartenpreis. */
 .bc {
@@ -401,7 +461,9 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (max-width: 900px) {
   .hero, .verdict, .info, .duo, .beleg { grid-template-columns: minmax(0, 1fr); }
   .hero__card { order: -1; }
-  .hero__card .bc { max-width: 380px; margin: 0 auto; transform: rotate(-3deg); }
+  .hero__card { justify-items: center; gap: 32px; padding-top: 12px; }
+  .hero__tilt { max-width: 380px; transform: rotate(-3deg); }
+  .tafel { max-width: 380px; }
   .verdict .bc { margin: 0 auto; }
   .compare { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps { grid-template-columns: minmax(0, 1fr); gap: 32px; }
@@ -413,7 +475,9 @@ tbody tr:last-child td { border-bottom: 0; }
   .wrap { padding: 0 16px; }
   .top__nav a { display: none; }
   .verdict__facts { gap: 8px 28px; }
-  .hero__card .bc { max-width: 300px; }
+  .hero__tilt { max-width: 320px; }
+  .tafel { max-width: 340px; padding: 10px 10px 12px; gap: 6px; font-size: .74rem; }
+  .tafel .flap { gap: 1px; }
   .compare { gap: 12px; }
   .minicard { padding: 10px 12px; border-radius: 12px; }
   .posten__name { white-space: normal; }
@@ -422,6 +486,6 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bc__fill { transition: none; }
-  .wechsel { transition: none; }
+  .hero__tilt { transition: none; }
   .bc--loading .bc__fill { animation: none; transform: scaleX(.5); }
 }

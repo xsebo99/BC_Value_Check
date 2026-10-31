@@ -109,21 +109,84 @@ function startImport() {
 // ---------------------------------------------------------------------------
 // Browser-Erweiterung (optional): meldet sich per postMessage aus ihrem Content-Script auf dieser Seite.
 // ---------------------------------------------------------------------------
-// Hero: die Kartennummer wechselt alle paar Sekunden 25 → 50 → 100
-function setupWechsel() {
-  const el = $('#wechsel');
-  if (!el) return;
-  const werte = ['25', '50', '100'];
+// Hero: Fallblatt-Titel, Musterkarte und Abfahrtstafel wechseln gemeinsam 25 → 50 → 100.
+// Beispielwerte einer erfundenen Person, damit jede Variante ein anderes Ergebnis zeigt.
+const HERO_BEISPIELE = [
+  { nr: '25', karte: 'BC 25', typ: 'BahnCard 25', gespart: 41, preis: 62.90, bilanz: 'NOCH NICHT', ton: '' },
+  { nr: '50', karte: 'BC 50', typ: 'BahnCard 50', gespart: 312, preis: 244, bilanz: 'LOHNT SICH', ton: 'plus' },
+  { nr: '100', karte: 'BC100', typ: 'BahnCard 100', gespart: 3910, preis: 4899, bilanz: 'LOHNT NICHT', ton: 'minus' },
+];
+const RUHIG = matchMedia('(prefers-reduced-motion: reduce)');
+const FLAP_ZEICHEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+// Blättert jede Zelle über ein paar Zufallszeichen zum Zielzeichen, leicht versetzt wie an der Tafel
+function flapZu(el, text, rechts = false) {
+  const zellen = [...el.children];
+  const zeichen = [...text];
+  const rest = Array(Math.max(0, zellen.length - zeichen.length)).fill(' ');
+  const ziel = rechts ? rest.concat(zeichen) : zeichen.concat(rest);
+  zellen.forEach((zelle, i) => {
+    const soll = ziel[i] === ' ' ? ' ' : ziel[i];
+    clearInterval(zelle._flap);
+    if (zelle.textContent === soll) return;
+    if (RUHIG.matches) { zelle.textContent = soll; return; }
+    let schritte = 3 + i % 4 + Math.floor(Math.random() * 3);
+    zelle._flap = setInterval(() => {
+      zelle.textContent = --schritte > 0 ? FLAP_ZEICHEN[Math.floor(Math.random() * FLAP_ZEICHEN.length)] : soll;
+      if (schritte <= 0) clearInterval(zelle._flap);
+      if (zelle.animate) zelle.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.35)', filter: 'brightness(.6)' }, { transform: 'scaleY(1)' }], { duration: 65, easing: 'ease-out' });
+    }, 65);
+  });
+}
+
+function setupHero() {
+  const bc = $('#hero-bc');
+  if (!bc) return;
+  const tafelBilanz = $('#tafel-bilanz');
+  const tafelSaldo = $('#tafel-saldo');
+
+  const zeige = (b) => {
+    const saldo = b.gespart - b.preis;
+    const saldoText = (saldo >= 0 ? '+' : '−') + int(Math.abs(saldo)) + ' €';
+    flapZu($('#wechsel'), b.nr, true);
+    flapZu($('#tafel-karte'), b.karte);
+    tafelBilanz.dataset.ton = b.ton;
+    flapZu(tafelBilanz, b.bilanz);
+    tafelSaldo.dataset.ton = saldo >= 0 ? 'plus' : 'minus';
+    flapZu(tafelSaldo, saldoText, true);
+    const fill = Math.min(1, b.gespart / b.preis);
+    bc.style.setProperty('--fill', fill.toFixed(3));
+    bc.classList.toggle('bc--full', fill >= 1);
+    $('#hero-typ').textContent = b.typ;
+    $('#hero-saldo').textContent = saldoText;
+    $('#hero-sub').textContent = `${int(b.gespart)} € gespart · Karte ${eur(b.preis).replace(',00', '')}`;
+  };
+
   let i = 0;
   setInterval(() => {
-    el.classList.add('is-raus');
-    setTimeout(() => {
-      i = (i + 1) % werte.length;
-      el.textContent = werte[i];
-      el.classList.replace('is-raus', 'is-rein');
-      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('is-rein')));
-    }, 250);
-  }, 2600);
+    if (document.hidden) return;
+    i = (i + 1) % HERO_BEISPIELE.length;
+    zeige(HERO_BEISPIELE[i]);
+  }, 4200);
+
+  // Karte kippt leicht mit der Maus, der Glanz wandert mit
+  const tilt = $('.hero__tilt');
+  if (RUHIG.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const flaeche = $('.hero__card');
+  flaeche.addEventListener('pointermove', (e) => {
+    const r = tilt.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+    tilt.classList.add('is-aktiv');
+    tilt.style.setProperty('--ry', ((x - .5) * 14).toFixed(2) + 'deg');
+    tilt.style.setProperty('--rx', ((.5 - y) * 10).toFixed(2) + 'deg');
+    tilt.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+    tilt.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+  });
+  flaeche.addEventListener('pointerleave', () => {
+    tilt.classList.remove('is-aktiv');
+    for (const p of ['--rx', '--ry', '--gx', '--gy']) tilt.style.removeProperty(p);
+  });
 }
 
 function setupErweiterung() {
@@ -664,7 +727,7 @@ $('#file-input').addEventListener('change', async (e) => {
 
 setupBookmarklet();
 setupErweiterung();
-setupWechsel();
+setupHero();
 
 if (location.hash === '#import') {
   startImport();
