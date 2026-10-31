@@ -77,6 +77,29 @@
     color-scheme: dark;
   }
 }
+/* Von Hand gewählter Dark Mode (Umschalter im Kopf) – dieselben Werte wie oben */
+:root[data-theme="dark"] {
+  --schotter: #0b0e12;
+  --fahrkarte: #171b21;
+  --eingabe: #0f1217;
+  --tinte: #eceef2;
+  --tinte-2: #b1b8c4;
+  --tinte-3: #7f8796;
+  --tinte-4: #4f5663;
+  --kante: rgba(255, 255, 255, .08);
+  --kante-stark: rgba(255, 255, 255, .16);
+  --raster: rgba(255, 255, 255, .05);
+  --punktlinie: #3a414c;
+  --verkehrsrot: #ff4c56;
+  --verkehrsrot-text: #ff6b73;
+  --verkehrsrot-hauch: #33171a;
+  --signalgruen: #3fc883;
+  --signalgruen-hauch: #12291d;
+  --bahncard: #252b35;
+  --schatten-flaeche: 0 0 0 1px rgba(255, 255, 255, .07);
+  --schatten-karte: 0 0 0 1px #2e3540, 0 20px 50px -20px rgba(0, 0, 0, .8);
+  color-scheme: dark;
+}
 
 /* Grundlagen */
 * { box-sizing: border-box; }
@@ -147,6 +170,16 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .top__nav { display: flex; align-items: center; gap: 24px; }
 .top__nav a { color: var(--tinte-2); text-decoration: none; font-size: .92rem; }
 .top__nav a:hover { color: var(--tinte); }
+/* Hell/Dunkel-Umschalter: zeigt, wohin er schaltet (Mond = dunkel, Sonne = hell) */
+.design-btn {
+  display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--fahrkarte); color: var(--tinte-2); box-shadow: inset 0 0 0 1px var(--kante);
+  transition: color 150ms var(--ease), box-shadow 150ms var(--ease), transform 120ms var(--ease);
+}
+.design-btn:hover { color: var(--tinte); box-shadow: inset 0 0 0 1px var(--kante-stark); }
+.design-btn:active { transform: scale(.92); }
+.design-btn__sonne, .design-btn[data-modus="dark"] .design-btn__mond { display: none; }
+.design-btn[data-modus="dark"] .design-btn__sonne { display: block; }
 
 /* Buttons */
 .btn {
@@ -183,7 +216,7 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 
 /* Hero-Karte: Musterkarte mit Chip, Nummer und Glanz */
 .bc--hero { grid-template-rows: auto 1fr auto auto; row-gap: 4px; }
-.bc--hero .bc__fill::after { width: 2px; box-shadow: 0 0 18px 6px rgba(255, 255, 255, .22); }
+.bc--hero::after { background: none; } /* Glanz kommt hier von .bc__glanz und folgt der Maus */
 .bc__glanz {
   position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
   background:
@@ -209,6 +242,8 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .bc--hero .bc__bottom { text-transform: uppercase; letter-spacing: .08em; font-size: clamp(.62rem, 1.15vw, .74rem); }
 
 /* Die BahnCard – Signatur der Seite: die Karte füllt sich mit der Ersparnis bis zum Kartenpreis. */
+/* --fill als Zahl registriert, damit Füllung und Kante gemeinsam weich laufen */
+@property --fill { syntax: "<number>"; inherits: true; initial-value: 0; }
 .bc {
   --fill: 0;
   --fill-color: var(--signalgruen);
@@ -216,19 +251,32 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
   aspect-ratio: 85.6 / 54; width: 100%; border-radius: clamp(14px, 2.2vw, 22px);
   padding: 6.5% 7%; display: grid; grid-template-rows: auto 1fr auto;
   background:
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, .035) 0 2px, transparent 2px 9px),
-    var(--bahncard);
-  color: var(--bahncard-text); box-shadow: var(--schatten-karte);
+    repeating-radial-gradient(circle at 115% 130%, rgba(255, 255, 255, .03) 0 1px, transparent 1px 8px),
+    linear-gradient(150deg, color-mix(in srgb, var(--bahncard), #fff 7%), var(--bahncard) 55%, color-mix(in srgb, var(--bahncard), #000 25%));
+  color: var(--bahncard-text);
+  box-shadow: var(--schatten-karte), 0 34px 60px -30px color-mix(in srgb, var(--fill-color) calc(var(--fill) * 70%), transparent);
   font-family: var(--font-display);
+  transition: --fill 1.4s cubic-bezier(.2, .75, .15, 1);
+}
+.bc::after { /* Haarlinie, Lichtkante oben und Glanz wie bei einer lackierten Karte */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, .16), transparent 55%),
+    linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .07) 50%, transparent 60%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 -1px 0 rgba(0, 0, 0, .2);
 }
 .bc__fill {
-  position: absolute; inset: 0; z-index: -1; background: var(--fill-color);
-  transform-origin: left center; transform: scaleX(var(--fill));
-  transition: transform 1.4s cubic-bezier(.2, .75, .15, 1);
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    repeating-radial-gradient(circle at 115% 130%, rgba(255, 255, 255, .055) 0 1px, transparent 1px 8px),
+    linear-gradient(140deg, color-mix(in srgb, var(--fill-color), #fff 16%), var(--fill-color) 45%, color-mix(in srgb, var(--fill-color), #000 32%));
+  clip-path: inset(0 calc((1 - var(--fill)) * 100%) 0 0);
 }
 .bc__fill::after { /* Kante der Füllung */
-  content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 3px; background: rgba(255, 255, 255, .55);
+  content: ""; position: absolute; top: 0; bottom: 0; left: calc(var(--fill) * 100% - 2px); width: 2px;
+  background: rgba(255, 255, 255, .6); box-shadow: 0 0 16px 5px rgba(255, 255, 255, .2);
 }
+.bc__amount, .bc__type { text-shadow: 0 1px 0 rgba(0, 0, 0, .12), 0 10px 30px rgba(0, 0, 0, .18); }
 .bc--full .bc__fill::after { display: none; }
 .bc--minus { --fill-color: var(--verkehrsrot); }
 .bc__top { display: flex; align-items: center; gap: 10px; }
@@ -246,8 +294,8 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .bc--preview .bc__amount { opacity: .9; }
 .bc--loading { max-width: 300px; margin: 0 auto 40px; }
 .bc--loading .bc__amount { font-size: 3rem; }
-.bc--loading .bc__fill { animation: laden 2.4s ease-in-out infinite; transition: none; }
-@keyframes laden { 0% { transform: scaleX(.05); } 50% { transform: scaleX(.8); } 100% { transform: scaleX(.05); } }
+.bc--loading .bc__fill { animation: laden 2.4s ease-in-out infinite; }
+@keyframes laden { 0% { --fill: .05; } 50% { --fill: .8; } 100% { --fill: .05; } }
 
 /* Schritte */
 .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
@@ -468,7 +516,7 @@ tbody tr:last-child td { border-bottom: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .bc__fill { transition: none; }
+  .bc { transition: none; }
   .hero__tilt { transition: none; }
-  .bc--loading .bc__fill { animation: none; transform: scaleX(.5); }
+  .bc--loading .bc__fill { animation: none; --fill: .5; }
 }
