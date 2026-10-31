@@ -42,7 +42,7 @@ const tag = (d) => new Date(String(d).slice(0, 10) + 'T12:00:00');
 function show(view) {
   for (const id of ['view-start', 'view-import', 'view-result']) $('#' + id).classList.toggle('hidden', id !== view);
   $('#btn-reset').classList.toggle('hidden', view === 'view-start');
-  $('#datenschutz').classList.toggle('hidden', view === 'view-import');
+  $('#info-seite').classList.toggle('hidden', view === 'view-import');
   $('#faq').classList.toggle('hidden', view === 'view-import');
   window.scrollTo({ top: 0 });
 }

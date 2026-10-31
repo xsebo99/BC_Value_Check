@@ -344,6 +344,11 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 /* Info-Bereich (FAQ + Datenschutz) */
 .info { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; margin-top: 20px; align-items: start; }
 .info #faq .details:first-of-type { border-top: 1px solid var(--kante); }
+.info__seite { display: grid; gap: 20px; }
+.trinkgeld .h3 { margin-bottom: 0; }
+.trinkgeld p { color: var(--tinte-2); margin: 10px 0 20px; }
+.trinkgeld .btn { gap: 10px; }
+.trinkgeld .trinkgeld__hinweis { margin: 12px 0 0; }
 .checks { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 16px; color: var(--tinte-2); }
 .checks li { position: relative; padding-left: 30px; }
 .checks li::before {
@@ -551,7 +556,7 @@ tbody tr:last-child td { border-bottom: 0; }
 
 /* Auftauchen: beim Laden gleiten Hero, Karte und Panels leicht versetzt von unten herein */
 @keyframes auftauchen { from { opacity: 0; transform: translateY(22px); } }
-.hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * {
+.hero__text > *, .hero__card, #so-gehts, .info .panel, #view-result.ist-neu .result > * {
   animation: auftauchen .8s cubic-bezier(.2, .75, .15, 1) backwards;
 }
 .hero__text > :nth-child(2) { animation-delay: .06s; }
@@ -560,15 +565,16 @@ tbody tr:last-child td { border-bottom: 0; }
 .hero__text > :nth-child(n+5) { animation-delay: .24s; }
 .hero__card { animation-delay: .15s; animation-duration: 1s; }
 #so-gehts { animation-delay: .3s; }
-.info > .panel { animation-delay: .4s; }
-.info > .panel + .panel { animation-delay: .48s; }
+.info .panel { animation-delay: .4s; }
+.info__seite .panel { animation-delay: .48s; }
+.info__seite .panel + .panel { animation-delay: .56s; }
 #view-result.ist-neu .result > :nth-child(2) { animation-delay: .08s; }
 #view-result.ist-neu .result > :nth-child(3) { animation-delay: .16s; }
 #view-result.ist-neu .result > :nth-child(n+4) { animation-delay: .24s; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * { animation: none; }
+  .hero__text > *, .hero__card, #so-gehts, .info .panel, #view-result.ist-neu .result > * { animation: none; }
   .bc { transition: none; }
   .hero__tilt { transition: none; }
   .bc--loading .bc__fill { animation: none; --fill: .5; }
