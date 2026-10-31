@@ -204,7 +204,6 @@ function setupErweiterung() {
     if (e.data.type === 'bc-ext-hallo') {
       $('#ext-card').classList.remove('hidden');
       document.body.classList.add('has-ext');
-      $('#so-gehts h2').textContent = 'Ohne Erweiterung: in drei Schritten';
     } else {
       importNachricht(e.data);
     }
@@ -239,6 +238,11 @@ function loadData(d, persist) {
   const alle = fahrten(d);
   state.klasse = alle.filter((x) => x.klasse === 1).length > alle.length / 2 ? 1 : 2;
   state.variante = 'normal';
+  // Nur beim ersten Anzeigen gleiten die Panels herein – nicht bei jedem Umschalten der Auswahl
+  const root = $('#view-result');
+  root.classList.add('ist-neu');
+  clearTimeout(root._neu);
+  root._neu = setTimeout(() => root.classList.remove('ist-neu'), 1400);
   render();
   show('view-result');
 }
@@ -593,7 +597,7 @@ function render() {
       </tr>`).join('') || '<tr><td colspan="5" class="muted">Keine Fahrten in diesem Zeitraum.</td></tr>'}</tbody>
     </table></div>
   </details>
-  <p class="stand">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Demo-Daten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p>
+  <p class="stand">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Beispieldaten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p>
   </div>`;
 
   const root = $('#view-result');

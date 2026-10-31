@@ -44,7 +44,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 | Feld | Datei / Vorgabe |
 |---|---|
 | Store-Icon 128×128 | `extension/icons/icon128.png` |
-| Screenshots (mind. 1, 1280×800 oder 640×400) | selbst aufnehmen: Startseite mit „Erweiterung erkannt“, Auswertung (Urteil + Kurve), Vergleichstabelle. Tipp: „Demo ansehen“ nutzen, dann sind keine echten Daten drauf. |
+| Screenshots (mind. 1, 1280×800 oder 640×400) | selbst aufnehmen: Startseite mit „Erweiterung erkannt“, Auswertung (Urteil + Kurve), Vergleichstabelle. Tipp: „Beispiel“ nutzen, dann sind keine echten Daten drauf. |
 | Kleine Werbekachel 440×280 (optional) | – |
 
 ## Datenschutz-Tab

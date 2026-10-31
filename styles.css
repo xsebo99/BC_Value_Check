@@ -529,8 +529,26 @@ tbody tr:last-child td { border-bottom: 0; }
   .posten__name { white-space: normal; }
   .hide-sm { display: none; }
 }
+/* Auftauchen: beim Laden gleiten Hero, Karte und Panels leicht versetzt von unten herein */
+@keyframes auftauchen { from { opacity: 0; transform: translateY(22px); } }
+.hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * {
+  animation: auftauchen .8s cubic-bezier(.2, .75, .15, 1) backwards;
+}
+.hero__text > :nth-child(2) { animation-delay: .06s; }
+.hero__text > :nth-child(3) { animation-delay: .12s; }
+.hero__text > :nth-child(4) { animation-delay: .18s; }
+.hero__text > :nth-child(n+5) { animation-delay: .24s; }
+.hero__card { animation-delay: .15s; animation-duration: 1s; }
+#so-gehts { animation-delay: .3s; }
+.info > .panel { animation-delay: .4s; }
+.info > .panel + .panel { animation-delay: .48s; }
+#view-result.ist-neu .result > :nth-child(2) { animation-delay: .08s; }
+#view-result.ist-neu .result > :nth-child(3) { animation-delay: .16s; }
+#view-result.ist-neu .result > :nth-child(n+4) { animation-delay: .24s; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * { animation: none; }
   .bc { transition: none; }
   .hero__tilt { transition: none; }
   .bc--loading .bc__fill { animation: none; --fill: .5; }
