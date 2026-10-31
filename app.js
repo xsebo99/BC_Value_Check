@@ -190,7 +190,7 @@ function zaehleHero(von, nach, dauer = 1200) {
 }
 
 // Euro-Beträge der Auswertung: zahl() schreibt sie mit Zielwert ins HTML, zahlenZaehlen() lässt sie hinlaufen –
-// beim ersten Anzeigen von 0, danach vom zuletzt gezeigten Wert (z. B. beim Wechsel der Kartenvariante).
+// beim ersten Mal von 0, danach vom zuletzt gezeigten Wert (z. B. beim Wechsel der Kartenvariante).
 const ZAHL_FORMAT = {
   eur,
   eur0,
@@ -201,6 +201,7 @@ function zahl(key, wert, format = 'eur') {
   return `<span class="zahl" data-key="${key}" data-wert="${wert}" data-format="${format}">${ZAHL_FORMAT[format](wert)}</span>`;
 }
 
+// Jeder Betrag zählt erst los, wenn er ins Bild kommt – auch die weiter unten, sobald man hinscrollt.
 function zahlenZaehlen(root, dauer = 1100) {
   const els = [...root.querySelectorAll('.zahl')].map((el) => {
     const nach = +el.dataset.wert;
@@ -208,21 +209,37 @@ function zahlenZaehlen(root, dauer = 1100) {
     state.zahlen[el.dataset.key] = nach;
     return { el, von, nach, f: ZAHL_FORMAT[el.dataset.format] };
   }).filter((z) => Math.abs(z.nach - z.von) >= 0.005);
-  cancelAnimationFrame(zahlenZaehlen.frame);
-  clearTimeout(zahlenZaehlen.ende);
-  if (RUHIG.matches || !els.length) return;
+  // Laufende Zähler und Beobachter der vorigen Darstellung beenden
+  if (zahlenZaehlen.beobachter) zahlenZaehlen.beobachter.disconnect();
+  for (const stopp of zahlenZaehlen.laufend || []) stopp();
+  zahlenZaehlen.laufend = [];
+  if (RUHIG.matches || !els.length || !window.IntersectionObserver) return;
+
+  const zuEl = new Map(els.map((z) => [z.el, z]));
+  for (const z of els) z.el.textContent = z.f(z.von);
+  const beobachter = new IntersectionObserver((eintraege) => {
+    const sichtbar = eintraege.filter((e) => e.isIntersecting).map((e) => zuEl.get(e.target));
+    for (const z of sichtbar) beobachter.unobserve(z.el);
+    if (sichtbar.length) zahlenZaehlen.laufend.push(zaehle(sichtbar, dauer));
+  }, { threshold: 0.6 });
+  for (const z of els) beobachter.observe(z.el);
+  zahlenZaehlen.beobachter = beobachter;
+}
+
+// Lässt eine Gruppe Beträge gemeinsam hinlaufen; gibt eine Stopp-Funktion zurück.
+function zaehle(els, dauer) {
   const start = performance.now();
   const ease = (t) => 1 - Math.pow(1 - t, 4);
+  let frame = 0;
   const schritt = (jetzt) => {
     const t = Math.min(1, (jetzt - start) / dauer), e = ease(t);
     for (const z of els) z.el.textContent = z.f(t < 1 ? z.von + (z.nach - z.von) * e : z.nach);
-    if (t < 1) zahlenZaehlen.frame = requestAnimationFrame(schritt);
+    if (t < 1) frame = requestAnimationFrame(schritt);
   };
-  for (const z of els) z.el.textContent = z.f(z.von);
-  zahlenZaehlen.frame = requestAnimationFrame(schritt);
+  frame = requestAnimationFrame(schritt);
   // Hintergrund-Tabs pausieren requestAnimationFrame – die Endwerte stehen trotzdem pünktlich da
-  clearTimeout(zahlenZaehlen.ende);
-  zahlenZaehlen.ende = setTimeout(() => schritt(start + dauer), dauer + 50);
+  const ende = setTimeout(() => schritt(start + dauer), dauer + 50);
+  return () => { cancelAnimationFrame(frame); clearTimeout(ende); };
 }
 
 function setupHero() {
