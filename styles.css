@@ -203,7 +203,6 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
   align-items: center; padding-top: clamp(40px, 8vw, 96px);
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.hero__trust { margin-top: 20px; }
 .hero__ohne { margin: 16px 0 0; color: var(--tinte-2); max-width: 34em; }
 .linkbtn { font: inherit; font-weight: 600; color: var(--tinte); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--tinte-4); }
 .linkbtn:hover { text-decoration-color: currentColor; }
@@ -215,8 +214,6 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 }
 .geraet-hinweis svg { flex: none; width: 22px; height: 22px; color: var(--tinte); }
 .geraet-hinweis strong { color: var(--tinte); font-weight: 650; }
-.has-ext .no-ext, body:not(.has-ext) .ext-only { display: none; }
-.hero__trust + .hero__trust { margin-top: 6px; }
 .hero__card { perspective: 1200px; display: grid; justify-items: end; }
 .hero__tilt {
   width: 100%; max-width: 440px; transform-style: preserve-3d;
@@ -534,15 +531,15 @@ tbody tr:last-child td { border-bottom: 0; }
 
 /* Diagramme bauen sich auf, sobald sie ins Bild kommen (app.js setzt .anim, dann .ist-sichtbar).
    Die Animationen warten pausiert im Startzustand und laufen erst mit .ist-sichtbar los. */
-.anim .line { stroke-dasharray: 1; animation: zeichnen 1.6s cubic-bezier(.45, 0, .2, 1) both paused; }
-.anim .area { animation: einblenden .9s .5s ease both paused; }
+/* Kurve: Linie und Fläche werden gemeinsam gleichmäßig von links aufgedeckt; jeder Punkt springt auf,
+   wenn die Kante ihn erreicht (--t = seine Lage auf der Zeitachse, 0…1) */
+.anim .aufdecken { transform-box: fill-box; transform-origin: left; animation: wachsen-x 1.6s linear both paused; }
 .anim .ref, .anim .ref-label { animation: einblenden .6s .2s ease both paused; }
-.anim .dot { transform-box: fill-box; transform-origin: center; animation: punkt .45s calc(var(--t, 0) * 1.5s + .1s) cubic-bezier(.3, 1.6, .5, 1) both paused; }
+.anim .dot { transform-box: fill-box; transform-origin: center; animation: punkt .45s calc(var(--t, 0) * 1.6s - .1s) cubic-bezier(.3, 1.6, .5, 1) both paused; }
 .anim .bar { transform-box: fill-box; transform-origin: bottom; animation: wachsen .7s calc(var(--i, 0) * 45ms) cubic-bezier(.2, .75, .15, 1) both paused; }
 .anim .bar--gespart { animation-delay: calc(var(--i, 0) * 45ms + .3s); }
 .anim .hbar__fill { transform-origin: left; animation: wachsen-x .9s calc(var(--i, 0) * 80ms + .1s) cubic-bezier(.2, .75, .15, 1) both paused; }
-.anim.ist-sichtbar :is(.line, .area, .ref, .ref-label, .dot, .bar, .hbar__fill) { animation-play-state: running; }
-@keyframes zeichnen { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.anim.ist-sichtbar :is(.aufdecken, .ref, .ref-label, .dot, .bar, .hbar__fill) { animation-play-state: running; }
 @keyframes einblenden { from { opacity: 0; } }
 @keyframes punkt { from { transform: scale(0); opacity: 0; } }
 @keyframes wachsen { from { transform: scaleY(0); } }

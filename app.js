@@ -121,7 +121,7 @@ function startImport() {
 }
 
 // ---------------------------------------------------------------------------
-// Browser-Erweiterung (optional): meldet sich per postMessage aus ihrem Content-Script auf dieser Seite.
+// Hero
 // ---------------------------------------------------------------------------
 // Hero: Fallblatt-Titel und Musterkarte wechseln gemeinsam 25 → 50 → 100.
 // Beispielwerte einer erfundenen Person, damit jede Variante ein anderes Ergebnis zeigt.
@@ -302,26 +302,6 @@ function setupHero() {
     tilt.classList.remove('is-aktiv');
     for (const p of ['--rx', '--ry', '--gx', '--gy']) tilt.style.removeProperty(p);
   });
-}
-
-function setupErweiterung() {
-  window.addEventListener('message', (e) => {
-    if (e.source !== window || !e.data || e.data.quelle !== 'bc-erweiterung') return;
-    if (e.data.type === 'bc-ext-hallo') {
-      $('#ext-card').classList.remove('hidden');
-      document.body.classList.add('has-ext');
-    } else {
-      importNachricht(e.data);
-    }
-  });
-  $('#btn-ext').addEventListener('click', () => {
-    show('view-import');
-    $('#import-title').textContent = 'Hole deine Fahrten von bahn.de …';
-    $('#import-text').textContent = 'Im bahn.de-Tab anmelden, dann geht es automatisch weiter.';
-    $('#import-bar span').style.width = '3%';
-    window.postMessage({ type: 'bc-ext-start' }, location.origin);
-  });
-  window.postMessage({ type: 'bc-ext-ping' }, location.origin);
 }
 
 function validData(d) {
@@ -781,8 +761,11 @@ function chartKurve(kurve, von, bis, preis, heute) {
     ${ticks.map((t) => `<line class="grid" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${PAD.l - 8}" y="${y(t) + 4}" text-anchor="end">${eur0(t)}</text>`).join('')}
     ${months.map((d) => `<text x="${x(d)}" y="${H - 8}" text-anchor="middle">${d.toLocaleDateString('de-DE', { month: 'short' })}</text>`).join('')}
     ${heute < bis ? `<line class="today" x1="${x(heute)}" x2="${x(heute)}" y1="${PAD.t}" y2="${H - PAD.b}"/><text x="${x(heute) + 4}" y="${PAD.t + 10}">heute</text>` : ''}
-    <path class="area" d="${area}"/>
-    <path class="line" d="${path}" pathLength="1"/>
+    <clipPath id="kurve-aufdecken"><rect class="aufdecken" x="${PAD.l - 3}" y="0" width="${endX - PAD.l + 6}" height="${H}"/></clipPath>
+    <g clip-path="url(#kurve-aufdecken)">
+      <path class="area" d="${area}"/>
+      <path class="line" d="${path}"/>
+    </g>
     <line class="ref" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(preis)}" y2="${y(preis)}"/>
     <text class="ref-label" x="${W - PAD.r}" y="${y(preis) - 6}" text-anchor="end">Kartenpreis ${eur(preis)}</text>
     ${kurve.map((p, i) => {
@@ -790,7 +773,7 @@ function chartKurve(kurve, von, bis, preis, heute) {
       const px = x(p.datum);
       const links = i ? (x(kurve[i - 1].datum) + px) / 2 : Math.max(PAD.l, px - 12);
       const rechts = i < kurve.length - 1 ? (px + x(kurve[i + 1].datum)) / 2 : Math.min(W - PAD.r, px + 12);
-      return `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><rect class="hit" x="${links}" y="${PAD.t}" width="${Math.max(rechts - links, 1)}" height="${H - PAD.t - PAD.b}"/><line class="guide" x1="${px}" x2="${px}" y1="${PAD.t}" y2="${H - PAD.b}"/><circle class="dot" cx="${px}" cy="${y(p.kum)}" r="4" style="--t:${((px - PAD.l) / (W - PAD.l - PAD.r)).toFixed(3)}"/></g>`;
+      return `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><rect class="hit" x="${links}" y="${PAD.t}" width="${Math.max(rechts - links, 1)}" height="${H - PAD.t - PAD.b}"/><line class="guide" x1="${px}" x2="${px}" y1="${PAD.t}" y2="${H - PAD.b}"/><circle class="dot" cx="${px}" cy="${y(p.kum)}" r="4" style="--t:${((px - PAD.l) / Math.max(1, endX - PAD.l)).toFixed(3)}"/></g>`;
     }).join('')}
     <line class="axis" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(0)}" y2="${y(0)}"/>
   </svg>`;
@@ -928,7 +911,6 @@ $('#file-input').addEventListener('change', async (e) => {
 });
 
 setupBookmarklet();
-setupErweiterung();
 setupHero();
 
 if (location.hash === '#import') {

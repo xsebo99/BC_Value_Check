@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bahnkarte24 – hat sich meine BahnCard gelohnt?</title>
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
-  <link rel="icon" href="extension/icons/icon32.png?v=2" sizes="32x32">
-  <link rel="icon" href="extension/icons/icon16.png?v=2" sizes="16x16">
-  <link rel="apple-touch-icon" href="extension/icons/icon128.png?v=2">
+  <link rel="icon" href="icons/icon32.png?v=2" sizes="32x32">
+  <link rel="icon" href="icons/icon16.png?v=2" sizes="16x16">
+  <link rel="apple-touch-icon" href="icons/icon128.png?v=2">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=26">
   <script src="theme.js?v=20"></script>
 </head>
 <body>
   <header class="top">
     <div class="wrap top__inner">
       <a class="brand" href="./" aria-label="Bahnkarte24 – Startseite">
-        <img class="brand__logo" src="extension/icons/icon32.png?v=2" srcset="extension/icons/icon128.png?v=2 4x, extension/icons/icon48.png?v=2 1.5x" width="32" height="32" alt="">
+        <img class="brand__logo" src="icons/icon32.png?v=2" srcset="icons/icon128.png?v=2 4x, icons/icon48.png?v=2 1.5x" width="32" height="32" alt="">
         <span class="brand__name">Bahnkarte24</span>
       </a>
       <nav class="top__nav" aria-label="Seitennavigation">
@@ -46,12 +46,10 @@
           </p>
 
           <div class="hero__actions">
-            <button class="btn btn--big ext-only" id="btn-ext" type="button">Meine Fahrten von bahn.de holen</button>
-            <a class="btn btn--big no-ext" href="#so-gehts">Los geht's</a>
+            <a class="btn btn--big" href="#so-gehts">Los geht's</a>
             <button class="btn btn--ghost btn--big" id="btn-demo" type="button">Beispiel</button>
           </div>
           <p class="hero__ohne small">Noch keine BahnCard? Wir rechnen mit deinen vergangenen Fahrten aus, ob sich eine gelohnt hätte. <button class="linkbtn" id="btn-demo-ohne" type="button">Beispiel ohne Karte</button></p>
-          <p class="hero__trust small muted hidden" id="ext-card">Öffnet bahn.de. Anmelden, den Rest erledigt die Erweiterung.</p>
         </div>
 
         <div class="hero__card" aria-hidden="true">
@@ -170,6 +168,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=29"></script>
+  <script src="app.js?v=30"></script>
 </body>
 </html>

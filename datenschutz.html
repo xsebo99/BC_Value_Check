@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Datenschutz – Bahnkarte24</title>
-  <meta name="description" content="Datenschutzerklärung der Webseite und der Browser-Erweiterung Bahnkarte24.">
-  <link rel="icon" href="extension/icons/icon32.png?v=2" sizes="32x32">
-  <link rel="icon" href="extension/icons/icon16.png?v=2" sizes="16x16">
-  <link rel="apple-touch-icon" href="extension/icons/icon128.png?v=2">
-  <link rel="stylesheet" href="styles.css?v=25">
+  <meta name="description" content="Datenschutzerklärung der Webseite Bahnkarte24 und ihres Lesezeichens.">
+  <link rel="icon" href="icons/icon32.png?v=2" sizes="32x32">
+  <link rel="icon" href="icons/icon16.png?v=2" sizes="16x16">
+  <link rel="apple-touch-icon" href="icons/icon128.png?v=2">
+  <link rel="stylesheet" href="styles.css?v=26">
   <script src="theme.js?v=20"></script>
 </head>
 <body>
   <header class="top">
     <div class="wrap top__inner">
       <a class="brand" href="./" aria-label="Bahnkarte24 – Startseite">
-        <img class="brand__logo" src="extension/icons/icon32.png?v=2" srcset="extension/icons/icon128.png?v=2 4x, extension/icons/icon48.png?v=2 1.5x" width="32" height="32" alt="">
+        <img class="brand__logo" src="icons/icon32.png?v=2" srcset="icons/icon128.png?v=2 4x, icons/icon48.png?v=2 1.5x" width="32" height="32" alt="">
         <span class="brand__name">Bahnkarte24</span>
       </a>
       <nav class="top__nav" aria-label="Seitennavigation">
@@ -31,7 +31,7 @@
   <main class="wrap prose" id="main">
     <p class="eyebrow">Stand: 31. Oktober 2026</p>
     <h1 class="display">Datenschutz&shy;erklärung</h1>
-    <p class="lead">Gilt für die Webseite <a href="./">Bahnkarte24</a>, das Lesezeichen und die Browser-Erweiterung „Bahnkarte24“.</p>
+    <p class="lead">Gilt für die Webseite <a href="./">Bahnkarte24</a> und das Lesezeichen.</p>
 
     <h2>Kurz gesagt</h2>
     <ul class="checks">
@@ -41,7 +41,7 @@
     </ul>
 
     <h2>Welche Daten verarbeitet werden</h2>
-    <p>Wenn du das Lesezeichen anklickst oder in der Erweiterung „Meine Fahrten von bahn.de holen“ wählst, werden auf www.bahn.de – mit deiner bestehenden Anmeldung – folgende Daten aus deinem Kundenkonto gelesen:</p>
+    <p>Wenn du das Lesezeichen anklickst, werden auf www.bahn.de – mit deiner bestehenden Anmeldung – folgende Daten aus deinem Kundenkonto gelesen:</p>
     <ul>
       <li>deine BahnCard(s): Typ, Klasse, Gültigkeitszeitraum;</li>
       <li>deine vergangenen Buchungen: Datum, Start und Ziel, Züge und Umstiege, Tarif, Klasse, Preis, ausgewiesene BahnCard-Ersparnis, Reservierungen und die letzten vier Ziffern der Auftragsnummer.</li>
@@ -49,17 +49,9 @@
     <p>Namen, Anschrift, E-Mail-Adresse, Geburtsdatum, Zahlungsdaten und deine BahnCard-Nummer werden <strong>nicht</strong> übernommen. Das Login-Token von bahn.de wird nur im bahn.de-Tab für die Abfragen verwendet und nirgendwohin übertragen.</p>
 
     <h2>Wohin die Daten gehen</h2>
-    <p>Die gelesenen Daten werden direkt im Browser an den Bahnkarte24-Tab übergeben (über <code>postMessage</code> bzw. die Nachrichten-Schnittstelle der Erweiterung) und dort ausgewertet. Sie werden im Sitzungsspeicher dieses Tabs (<code>sessionStorage</code>) abgelegt und beim Schließen des Tabs oder mit „Neu starten“ gelöscht. Die Erweiterung speichert nur vorübergehend, welche Tabs gerade zusammengehören (<code>chrome.storage.session</code>); das wird beim Beenden des Browsers gelöscht.</p>
+    <p>Die gelesenen Daten werden direkt im Browser an den Bahnkarte24-Tab übergeben (über <code>postMessage</code>) und dort ausgewertet. Sie werden im Sitzungsspeicher dieses Tabs (<code>sessionStorage</code>) abgelegt und beim Schließen des Tabs oder mit „Neu starten“ gelöscht.</p>
     <p>Falls das Auswertungsfenster blockiert war, speichert das Lesezeichen die Daten als Datei <code>bahnkarte24-daten.json</code> auf deinem Gerät. Diese Datei verlässt dein Gerät nur, wenn du sie selbst weitergibst.</p>
     <p>Wenn du oben zwischen hellem und dunklem Design wechselst, merkt sich dein Browser diese Wahl (<code>localStorage</code>, Eintrag <code>sparschiene-design</code>). Das ist keine personenbezogene Angabe und wird nirgendwohin übertragen.</p>
-
-    <h2>Berechtigungen der Erweiterung</h2>
-    <ul>
-      <li><strong>Zugriff auf www.bahn.de:</strong> nur um im von der Erweiterung geöffneten Tab nach deiner Anmeldung deine BahnCard und Buchungen zu lesen. In anderen bahn.de-Tabs tut die Erweiterung nichts.</li>
-      <li><strong>Zugriff auf diese Webseite:</strong> um den Ein-Klick-Button anzuzeigen und die Daten an die Auswertung zu übergeben.</li>
-      <li><strong>storage:</strong> um sich während des Einlesens zu merken, welcher bahn.de-Tab zu welchem Auswertungs-Tab gehört.</li>
-    </ul>
-    <p>Die Erweiterung ändert keine Buchungen, nimmt keine Käufe vor und liest keine anderen Webseiten.</p>
 
     <h2>Hosting und Schriften</h2>
     <p>Die Webseite wird über GitHub Pages (GitHub, Inc., USA) ausgeliefert. Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten wie deine IP-Adresse, um die Seite auszuliefern und vor Missbrauch zu schützen. Details: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">Datenschutzerklärung von GitHub</a>. Deine Reisedaten erreichen GitHub dabei nicht. Die Schriften liegen auf derselben Seite; es werden keine externen Schriftdienste aufgerufen.</p>

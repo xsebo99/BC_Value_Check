@@ -1,8 +1,7 @@
-// Bahnkarte24 – gemeinsame Sammel-Logik für Lesezeichen (collector.js) und Browser-Erweiterung.
+// Bahnkarte24 – Sammel-Logik für das Lesezeichen (collector.js).
 // Läuft auf www.bahn.de mit dem Login-Token aus sessionStorage. Liest BahnCard(s) und vergangene Aufträge
 // über die Schnittstellen, die bahn.de selbst nutzt, und reduziert sie auf das Nötige (keine Namen, Adressen, E-Mails).
 // Wichtig: Wird fürs Lesezeichen in eine Zeile gepackt – nur ganze Kommentarzeilen, überall Semikolons.
-// Kopie für die Erweiterung: extension/core.js (bei Änderungen mitkopieren).
 async function bcSammeln(token, step) {
   const API = 'https://www.bahn.de/web/api';
   const H = { accept: 'application/json', Authorization: 'Bearer ' + token };
