@@ -303,23 +303,44 @@ function setupHero() {
   }, HERO_WECHSEL);
 
   // Karte kippt leicht mit der Maus, der Glanz wandert mit
+  if (!KIPPEN) return;
   const tilt = $('.hero__tilt');
-  if (RUHIG.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   const flaeche = $('.hero__card');
-  flaeche.addEventListener('pointermove', (e) => {
-    const r = tilt.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
-    tilt.classList.add('is-aktiv');
-    tilt.style.setProperty('--ry', ((x - .5) * 14).toFixed(2) + 'deg');
-    tilt.style.setProperty('--rx', ((.5 - y) * 10).toFixed(2) + 'deg');
-    tilt.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
-    tilt.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+  flaeche.addEventListener('pointermove', (e) => kippe(tilt, e));
+  flaeche.addEventListener('pointerleave', () => aufrichten(tilt));
+}
+
+// Jede BahnCard kippt mit der Maus und der Glanz folgt – auf der Startseite (siehe oben), in der Auswertung
+// und beim Laden. Nur mit Maus und ohne „Bewegung reduzieren“.
+const KIPPEN = !RUHIG.matches && matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+function kippe(el, e) {
+  const r = el.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+  el.classList.add('is-aktiv');
+  el.style.setProperty('--ry', ((x - .5) * 14).toFixed(2) + 'deg');
+  el.style.setProperty('--rx', ((.5 - y) * 10).toFixed(2) + 'deg');
+  el.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+  el.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+}
+
+function aufrichten(el) {
+  el.classList.remove('is-aktiv');
+  for (const p of ['--rx', '--ry', '--gx', '--gy']) el.style.removeProperty(p);
+}
+
+// Alle übrigen Karten entstehen erst später (Auswertung wird neu gezeichnet) – deshalb über das Dokument.
+function setupKarten() {
+  if (!KIPPEN) return;
+  let aktiv = null;
+  document.addEventListener('pointermove', (e) => {
+    const bc = e.target.closest && e.target.closest('.bc:not(.bc--hero)');
+    if (aktiv && aktiv !== bc) aufrichten(aktiv);
+    aktiv = bc;
+    if (bc) kippe(bc, e);
   });
-  flaeche.addEventListener('pointerleave', () => {
-    tilt.classList.remove('is-aktiv');
-    for (const p of ['--rx', '--ry', '--gx', '--gy']) tilt.style.removeProperty(p);
-  });
+  document.addEventListener('pointerleave', () => { if (aktiv) aufrichten(aktiv); aktiv = null; });
 }
 
 function validData(d) {
@@ -576,6 +597,7 @@ function render() {
       <div class="bc bc--gedacht ${plus ? '' : 'bc--minus'} ${anteil >= 1 ? 'bc--full' : ''}" data-fill="${anteil.toFixed(3)}" role="img"
         aria-label="${esc(name)}: hätte ${prozent} Prozent des Kartenpreises gespart">
         <div class="bc__fill"></div>
+        <div class="bc__glanz"></div>
         <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">${esc(name)}, ${klasse}. Klasse</span><span class="bc__klasse">gedacht</span></div>
         <div class="bc__amount">${zahl('netto', netto, 'saldo')}</div>
         <div class="bc__bottom"><span>${faktor > 1 ? 'aufs Jahr gerechnet' : `${datum(von)} – ${datum(bis)}`}</span><span class="bc__pct">${prozent} %</span></div>
@@ -603,6 +625,7 @@ function render() {
       <div class="bc ${plus ? '' : 'bc--minus'} ${anteil >= 1 ? 'bc--full' : ''}" data-fill="${anteil.toFixed(3)}" role="img"
         aria-label="${esc(kartenName(card))}: ${prozent} Prozent des Kartenpreises gespart">
         <div class="bc__fill"></div>
+        <div class="bc__glanz"></div>
         <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">${esc(kartenName(card))}</span></div>
         <div class="bc__amount">${zahl('netto', netto, 'saldo')}</div>
         <div class="bc__bottom"><span>${datum(von)} – ${datum(bis)}</span><span class="bc__pct">${prozent} %</span></div>
@@ -930,6 +953,7 @@ $('#file-input').addEventListener('change', async (e) => {
 
 setupBookmarklet();
 setupHero();
+setupKarten();
 
 if (location.hash === '#import') {
   startImport();

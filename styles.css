@@ -224,7 +224,7 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 
 /* Hero-Karte: Musterkarte mit Chip, Nummer und Glanz */
 .bc--hero { grid-template-rows: auto 1fr auto auto; row-gap: 4px; }
-.bc--hero::after { background: none; } /* Glanz kommt hier von .bc__glanz und folgt der Maus */
+.bc:has(> .bc__glanz)::after { background: none; } /* Glanz kommt hier von .bc__glanz und folgt der Maus */
 .bc__glanz {
   position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
   background:
@@ -264,8 +264,11 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
   color: var(--bahncard-text);
   box-shadow: var(--schatten-karte), 0 34px 60px -30px color-mix(in srgb, var(--fill-color) calc(var(--fill) * 70%), transparent);
   font-family: var(--font-display);
-  transition: --fill 1.4s cubic-bezier(.2, .75, .15, 1);
+  transition: --fill 1.4s cubic-bezier(.2, .75, .15, 1), transform 500ms var(--ease);
 }
+/* Kippen mit der Maus (app.js setzt --rx/--ry); die Hero-Karte kippt über ihren Rahmen .hero__tilt */
+.bc:not(.bc--hero) { transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+.bc.is-aktiv { transition: --fill 1.4s cubic-bezier(.2, .75, .15, 1), transform 120ms var(--ease); }
 .bc::after { /* Haarlinie, Lichtkante oben und Glanz wie bei einer lackierten Karte */
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background:
