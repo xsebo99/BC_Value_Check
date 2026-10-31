@@ -262,6 +262,24 @@ function zaehle(els, dauer) {
   return () => { cancelAnimationFrame(frame); clearTimeout(ende); };
 }
 
+// Kartentyp auf der Hero-Karte: alte Nummer rollt nach oben weg, neue kommt von unten nach.
+function rolleZu(el, text) {
+  if (el.textContent === text) return;
+  if (RUHIG.matches || !el.animate) { el.textContent = text; return; }
+  const raus = el.animate([
+    { transform: 'none', opacity: 1, filter: 'blur(0)' },
+    { transform: 'translateY(-75%)', opacity: 0, filter: 'blur(2px)' },
+  ], { duration: 240, easing: 'cubic-bezier(.5, 0, .9, .5)', fill: 'forwards' });
+  raus.onfinish = () => {
+    el.textContent = text;
+    el.animate([
+      { transform: 'translateY(75%)', opacity: 0, filter: 'blur(2px)' },
+      { transform: 'none', opacity: 1, filter: 'blur(0)' },
+    ], { duration: 460, easing: 'cubic-bezier(.2, .75, .15, 1)' });
+    raus.cancel();
+  };
+}
+
 function setupHero() {
   const bc = $('#hero-bc');
   if (!bc) return;
@@ -272,7 +290,7 @@ function setupHero() {
     const fill = Math.min(1, b.gespart / b.preis);
     bc.style.setProperty('--fill', fill.toFixed(3));
     bc.classList.toggle('bc--full', fill >= 1);
-    $('#hero-typ').textContent = b.typ;
+    rolleZu($('#hero-typnr'), b.nr);
     zaehleHero(vorher, b);
     vorher = b;
   };

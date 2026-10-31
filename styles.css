@@ -294,6 +294,7 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
   display: grid; place-items: center; width: 2.1em; height: 1.45em; border-radius: .3em;
   background: #fff; color: var(--bahncard); font-weight: 800; font-size: clamp(.8rem, 1.6vw, 1rem);
 }
+.bc__typnr { display: inline-block; }
 .bc__type { font-weight: 650; font-stretch: 90%; font-size: clamp(.85rem, 1.7vw, 1.05rem); letter-spacing: .01em; }
 .bc__amount {
   align-self: center; font-weight: 800; font-stretch: 72%; letter-spacing: -.03em; line-height: 1;
