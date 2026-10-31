@@ -155,20 +155,89 @@ function flapZu(el, text, rechts = false) {
   });
 }
 
+// Zahlen laufen weich vom alten zum neuen Wert – im Takt mit der Füllung der Karte.
+const saldoText = (v) => (Math.round(v) >= 0 ? '+' : '−') + int(Math.abs(v)) + ' €';
+const subText = (gespart, preis) => `${int(gespart)} € gespart · Karte ${eur(preis).replace(',00', '')}`;
+
+function zaehleHero(von, nach, dauer = 1200) {
+  const saldo = $('#hero-saldo'), sub = $('#hero-sub');
+  cancelAnimationFrame(zaehleHero.frame);
+  clearTimeout(zaehleHero.ende);
+  if (RUHIG.matches) {
+    saldo.textContent = saldoText(nach.gespart - nach.preis);
+    sub.textContent = subText(nach.gespart, nach.preis);
+    return;
+  }
+  const start = performance.now();
+  const ease = (t) => 1 - Math.pow(1 - t, 4);
+  const schritt = (jetzt) => {
+    const t = Math.min(1, (jetzt - start) / dauer), e = ease(t);
+    const g = von.gespart + (nach.gespart - von.gespart) * e;
+    const p = von.preis + (nach.preis - von.preis) * e;
+    saldo.textContent = saldoText(g - p);
+    sub.textContent = subText(t < 1 ? Math.round(g) : nach.gespart, t < 1 ? Math.round(p) : nach.preis);
+    if (t < 1) zaehleHero.frame = requestAnimationFrame(schritt);
+  };
+  zaehleHero.frame = requestAnimationFrame(schritt);
+  clearTimeout(zaehleHero.ende);
+  zaehleHero.ende = setTimeout(() => schritt(start + dauer), dauer + 50);
+  // Kurzer Ruck mit Unschärfe, als würde die Zahl hochrollen
+  if (saldo.animate) saldo.animate([
+    { transform: 'none', filter: 'blur(0)' },
+    { transform: 'translateY(-6%) scale(.96)', filter: 'blur(2px)', opacity: .75, offset: .22 },
+    { transform: 'none', filter: 'blur(0)', opacity: 1 },
+  ], { duration: dauer * .8, easing: 'cubic-bezier(.2, .75, .15, 1)' });
+}
+
+// Euro-Beträge der Auswertung: zahl() schreibt sie mit Zielwert ins HTML, zahlenZaehlen() lässt sie hinlaufen –
+// beim ersten Anzeigen von 0, danach vom zuletzt gezeigten Wert (z. B. beim Wechsel der Kartenvariante).
+const ZAHL_FORMAT = {
+  eur,
+  eur0,
+  saldo: (v) => (Math.round(v * 100) >= 0 ? '+' : '−') + eur(Math.abs(v)),
+};
+
+function zahl(key, wert, format = 'eur') {
+  return `<span class="zahl" data-key="${key}" data-wert="${wert}" data-format="${format}">${ZAHL_FORMAT[format](wert)}</span>`;
+}
+
+function zahlenZaehlen(root, dauer = 1100) {
+  const els = [...root.querySelectorAll('.zahl')].map((el) => {
+    const nach = +el.dataset.wert;
+    const von = state.zahlen[el.dataset.key] != null ? state.zahlen[el.dataset.key] : 0;
+    state.zahlen[el.dataset.key] = nach;
+    return { el, von, nach, f: ZAHL_FORMAT[el.dataset.format] };
+  }).filter((z) => Math.abs(z.nach - z.von) >= 0.005);
+  cancelAnimationFrame(zahlenZaehlen.frame);
+  clearTimeout(zahlenZaehlen.ende);
+  if (RUHIG.matches || !els.length) return;
+  const start = performance.now();
+  const ease = (t) => 1 - Math.pow(1 - t, 4);
+  const schritt = (jetzt) => {
+    const t = Math.min(1, (jetzt - start) / dauer), e = ease(t);
+    for (const z of els) z.el.textContent = z.f(t < 1 ? z.von + (z.nach - z.von) * e : z.nach);
+    if (t < 1) zahlenZaehlen.frame = requestAnimationFrame(schritt);
+  };
+  for (const z of els) z.el.textContent = z.f(z.von);
+  zahlenZaehlen.frame = requestAnimationFrame(schritt);
+  // Hintergrund-Tabs pausieren requestAnimationFrame – die Endwerte stehen trotzdem pünktlich da
+  clearTimeout(zahlenZaehlen.ende);
+  zahlenZaehlen.ende = setTimeout(() => schritt(start + dauer), dauer + 50);
+}
+
 function setupHero() {
   const bc = $('#hero-bc');
   if (!bc) return;
 
+  let vorher = HERO_BEISPIELE[0];
   const zeige = (b) => {
-    const saldo = b.gespart - b.preis;
-    const saldoText = (saldo >= 0 ? '+' : '−') + int(Math.abs(saldo)) + ' €';
     flapZu($('#wechsel'), b.nr, true);
     const fill = Math.min(1, b.gespart / b.preis);
     bc.style.setProperty('--fill', fill.toFixed(3));
     bc.classList.toggle('bc--full', fill >= 1);
     $('#hero-typ').textContent = b.typ;
-    $('#hero-saldo').textContent = saldoText;
-    $('#hero-sub').textContent = `${int(b.gespart)} € gespart · Karte ${eur(b.preis).replace(',00', '')}`;
+    zaehleHero(vorher, b);
+    vorher = b;
   };
 
   let i = 0;
@@ -234,6 +303,7 @@ function loadData(d, persist) {
   state.data = d;
   state.cardIdx = defaultCard(d.bahncards);
   state.preise = {};
+  state.zahlen = {};
   // Ohne Karte: Klasse nach den meisten Fahrten vorwählen
   const alle = fahrten(d);
   state.klasse = alle.filter((x) => x.klasse === 1).length > alle.length / 2 ? 1 : 2;
@@ -374,7 +444,8 @@ function topN(arr, key, n = 3) {
 // Darstellung
 // ---------------------------------------------------------------------------
 // variante/klasse gelten nur, wenn keine Karte im Konto ist
-const state = { data: null, cardIdx: -1, preise: {}, variante: 'normal', klasse: 2 };
+// zahlen: zuletzt gezeigte Euro-Beträge je Schlüssel – von dort zählt die nächste Darstellung weiter
+const state = { data: null, cardIdx: -1, preise: {}, variante: 'normal', klasse: 2, zahlen: {} };
 
 function render() {
   const d = state.data;
@@ -469,15 +540,15 @@ function render() {
         aria-label="${esc(name)}: hätte ${prozent} Prozent des Kartenpreises gespart">
         <div class="bc__fill"></div>
         <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">${esc(name)}, ${klasse}. Klasse</span><span class="bc__klasse">gedacht</span></div>
-        <div class="bc__amount">${plus ? '+' : '−'}${eur(Math.abs(netto))}</div>
+        <div class="bc__amount">${zahl('netto', netto, 'saldo')}</div>
         <div class="bc__bottom"><span>${faktor > 1 ? 'aufs Jahr gerechnet' : `${datum(von)} – ${datum(bis)}`}</span><span class="bc__pct">${prozent} %</span></div>
       </div>
       <div>
         <p class="verdict__kicker">Hätte sich eine BahnCard gelohnt?</p>
         <h1 class="verdict__title">${plus ? `Ja, die ${esc(kandidat.name)}.` : 'Nein, ohne Karte warst du günstiger.'}</h1>
         <dl class="verdict__facts">
-          <div><dt>Hättest gespart</dt><dd>${eur(ersparnis)}</dd></div>
-          <div><dt>Kartenpreis</dt><dd>${eur(kartenpreis)}</dd></div>
+          <div><dt>Hättest gespart</dt><dd>${zahl('ersparnis', ersparnis)}</dd></div>
+          <div><dt>Kartenpreis</dt><dd>${zahl('kartenpreis', kartenpreis)}</dd></div>
         </dl>
         <p class="verdict__text">${
           plus ? (breakEven && faktor === 1 ? `Ab dem <strong>${datum(breakEven.datum)}</strong> (${esc(kurzName(breakEven.von))} → ${esc(kurzName(breakEven.nach))}) wärst du im Plus gewesen.` : `Unterm Strich <strong>${eur(netto)}</strong> weniger als ohne Karte.`)
@@ -496,15 +567,15 @@ function render() {
         aria-label="${esc(kartenName(card))}: ${prozent} Prozent des Kartenpreises gespart">
         <div class="bc__fill"></div>
         <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">${esc(kartenName(card))}</span></div>
-        <div class="bc__amount">${plus ? '+' : '−'}${eur(Math.abs(netto))}</div>
+        <div class="bc__amount">${zahl('netto', netto, 'saldo')}</div>
         <div class="bc__bottom"><span>${datum(von)} – ${datum(bis)}</span><span class="bc__pct">${prozent} %</span></div>
       </div>
       <div>
         <p class="verdict__kicker">Deine Bilanz</p>
         <h1 class="verdict__title">${plus ? 'Ja, sie hat sich gelohnt.' : laeuft ? 'Noch nicht drin.' : 'Nein, leider nicht.'}</h1>
         <dl class="verdict__facts">
-          <div><dt>Gespart</dt><dd>${eur(ersparnis)}</dd></div>
-          <div><dt>Kartenpreis</dt><dd>${eur(meinPreis)}</dd></div>
+          <div><dt>Gespart</dt><dd>${zahl('ersparnis', ersparnis)}</dd></div>
+          <div><dt>Kartenpreis</dt><dd>${zahl('kartenpreis', meinPreis)}</dd></div>
         </dl>
         <p class="verdict__text">${
           breakEven ? `Seit dem <strong>${datum(breakEven.datum)}</strong> (${esc(kurzName(breakEven.von))} → ${esc(kurzName(breakEven.nach))}) bist du im Plus.`
@@ -543,9 +614,9 @@ function render() {
     <div class="compare">${sz.map((s) => `<div class="option">
       <div class="minicard ${s.id === 'ohne' ? 'minicard--ohne' : ''} ${s.id === best.id ? 'minicard--best' : ''}">
         <div class="minicard__name"><span>${s.name}</span><span class="minicard__tag">${s.id === best.id ? 'günstigste' : s.id === mineId ? 'deine' : ''}</span></div>
-        <div class="minicard__total">${eur0(s.gesamt)}</div>
+        <div class="minicard__total">${zahl('gesamt-' + s.id, s.gesamt, 'eur0')}</div>
       </div>
-      <div class="option__row"><span>Tickets</span><span>${eur(s.tickets)}</span></div>
+      <div class="option__row"><span>Tickets</span><span>${zahl('tickets-' + s.id, s.tickets)}</span></div>
       <div class="option__row"><span>Karte</span>${s.id === 'ohne' ? '<span>–</span>' : `<input class="cell-input" data-preis="${s.id}" type="number" min="0" step="0.01" value="${s.karte.toFixed(2)}" aria-label="Kartenpreis ${s.name}">`}</div>
     </div>`).join('')}</div>
     ${schwellenText(liste, preise, faktor)}
@@ -553,9 +624,9 @@ function render() {
 
   // Statistik als Fahrtbeleg: die Strecke führt, der Rest steht wie auf einer Quittung
   const posten = [
-    ['Ausgegeben', eur(ausgegeben), liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : ''],
+    ['Ausgegeben', { html: zahl('ausgegeben', ausgegeben) }, liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : ''],
     ['Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: etwa 30–50 ct/km'],
-    ['Teuerste Fahrt', teuerste ? eur(teuerste.preis) : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : ''],
+    ['Teuerste Fahrt', teuerste ? { html: zahl('teuerste', teuerste.preis) } : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : ''],
     ['Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}-mal gefahren` : ''],
     ['Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}-mal` : ''],
     ['Meistgenutzte Züge', zuege.length ? zuege.map(([z, n]) => `${z} ${n}×`).join(' · ') : '–', ''],
@@ -573,7 +644,7 @@ function render() {
           <span><strong>${int(new Set(liste.map((x) => x.nr)).size)}</strong> Buchungen</span>
         </div>
       </div>
-      <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
+      <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${w.html || esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
     </div>
   </section>`;
 
@@ -603,6 +674,7 @@ function render() {
   const root = $('#view-result');
   const offen = root.querySelector('.trips[open]');
   root.innerHTML = html;
+  zahlenZaehlen(root);
   if (offen) root.querySelector('.trips').open = true;
   bind(root);
   // Karte erst leer zeichnen, dann füllen – beim ersten Anzeigen sieht man sie volllaufen.

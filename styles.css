@@ -529,6 +529,9 @@ tbody tr:last-child td { border-bottom: 0; }
   .posten__name { white-space: normal; }
   .hide-sm { display: none; }
 }
+/* Euro-Beträge zählen hoch – feste Ziffernbreite, damit nichts wackelt */
+.zahl { font-variant-numeric: tabular-nums; }
+
 /* Auftauchen: beim Laden gleiten Hero, Karte und Panels leicht versetzt von unten herein */
 @keyframes auftauchen { from { opacity: 0; transform: translateY(22px); } }
 .hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * {
