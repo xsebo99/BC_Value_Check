@@ -1,6 +1,9 @@
 // BahnCard-Bilanz – Hintergrund: öffnet den bahn.de-Tab und reicht Nachrichten an die Auswertungsseite weiter.
 // Der Zustand liegt in storage.session, weil der Service Worker zwischendurch beendet werden kann.
 const START_URL = 'https://www.bahn.de/buchung/kundenkonto/bahncard';
+const SITE_URL = 'https://xsebo99.github.io/BC_Value_Check/';
+
+chrome.action.onClicked.addListener(() => chrome.tabs.create({ url: SITE_URL }));
 
 const lesen = async () => (await chrome.storage.session.get('lauf')).lauf || null;
 const schreiben = (lauf) => (lauf ? chrome.storage.session.set({ lauf }) : chrome.storage.session.remove('lauf'));
