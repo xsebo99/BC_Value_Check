@@ -17,6 +17,8 @@ Quelle der Wahrheit für Werte ist `styles.css` (`:root` und der Dark-Mode-Block
 | `--tinte` (+ `-2..-4`) | Text und **bezahlte Beträge**: Balken, Tarif-Bars, Fortschritt | – |
 | `--bahncard` | die dunkle Karte als Objekt | Flächen/Panels |
 
+Einzige Ausnahme: Die wechselnde Kartennummer (25/50/100) im Hero-Titel ist rot, als Echo des Logos.
+
 Weitere Farben gibt es nicht. Wenn etwas eine neue Farbe zu brauchen scheint, wird es stattdessen über Gewicht oder Größe gelöst.
 
 ## Flächen & Tiefe

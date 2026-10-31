@@ -110,7 +110,8 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
   margin: 0 0 16px; font: 600 var(--t-meta)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--verkehrsrot-text);
 }
 /* Hero: wechselnde Kartennummer */
-.wechsel { display: inline-block; font-variant-numeric: tabular-nums; transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
+.nowrap { white-space: nowrap; }
+.wechsel { display: inline-block; color: var(--verkehrsrot); font-variant-numeric: tabular-nums; transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
 .wechsel.is-raus { opacity: 0; transform: translateY(-.25em); }
 .wechsel.is-rein { opacity: 0; transform: translateY(.25em); transition: none; }
 .display {
