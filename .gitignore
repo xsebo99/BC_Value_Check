@@ -1,4 +1,5 @@
 .claude/
 *.zip
 sparschiene-daten*.json
+bahnkarte24-daten*.json
 dist/

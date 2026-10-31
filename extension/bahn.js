@@ -1,4 +1,4 @@
-// SparSchiene – läuft auf www.bahn.de, aber nur im Tab, den die Erweiterung selbst geöffnet hat.
+// Bahnkarte24 – läuft auf www.bahn.de, aber nur im Tab, den die Erweiterung selbst geöffnet hat.
 // Wartet auf die Anmeldung, sammelt mit bcSammeln() (core.js) und schickt das Ergebnis an den Hintergrund.
 (async () => {
   const { sammeln } = await chrome.runtime.sendMessage({ type: 'wer' });
@@ -17,7 +17,7 @@
     'border-radius:12px;background:#fff;color:#1f2329;box-shadow:0 8px 30px rgba(0,0,0,.25);' +
     'font:14px/1.4 system-ui,sans-serif;border-left:5px solid #e30613';
   const titel = document.createElement('strong');
-  titel.textContent = 'SparSchiene';
+  titel.textContent = 'Bahnkarte24';
   const text = document.createElement('div');
   text.style.marginTop = '4px';
   box.append(titel, text);

@@ -1,11 +1,11 @@
-# Chrome Web Store – Einreichung „SparSchiene“
+# Chrome Web Store – Einreichung „Bahnkarte24“
 
 Alles, was beim Einreichen im [Developer Dashboard](https://chrome.google.com/webstore/devconsole) abgefragt wird, zum Kopieren.
-ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
+ZIP bauen: `node tools/build-extension.mjs` → `dist/bahnkarte24-<version>.zip`
 
 ## Store-Eintrag
 
-**Name:** SparSchiene
+**Name:** Bahnkarte24
 
 **Kurzbeschreibung** (max. 132 Zeichen, steht schon im Manifest):
 > Prüft mit deinen echten bahn.de-Fahrten, ob sich deine BahnCard gelohnt hat. Liest nur, nichts verlässt deinen Browser.
@@ -15,7 +15,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 
 **Ausführliche Beschreibung:**
 
-> Hat sich deine BahnCard gelohnt? SparSchiene rechnet es mit deinen echten Fahrten von bahn.de nach – mit einem Klick.
+> Hat sich deine BahnCard gelohnt? Bahnkarte24 rechnet es mit deinen echten Fahrten von bahn.de nach – mit einem Klick.
 >
 > So funktioniert's:
 > 1. Öffne https://xsebo99.github.io/SparSchiene/ und klicke auf „Meine Fahrten von bahn.de holen“.
@@ -34,7 +34,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 > • Die Erweiterung liest nur und ändert nichts an deinen Buchungen.
 > • Quellcode: https://github.com/xsebo99/SparSchiene
 >
-> SparSchiene ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.
+> Bahnkarte24 ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.
 
 **Website:** https://xsebo99.github.io/SparSchiene/
 **Support-URL:** https://github.com/xsebo99/SparSchiene/issues
@@ -50,7 +50,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 ## Datenschutz-Tab
 
 **Alleiniger Zweck (Single purpose):**
-> Liest auf Wunsch des Nutzers seine BahnCard und vergangenen Bahnbuchungen aus seinem bahn.de-Konto und übergibt sie an die Webseite SparSchiene, die im Browser berechnet, ob sich die BahnCard gelohnt hat.
+> Liest auf Wunsch des Nutzers seine BahnCard und vergangenen Bahnbuchungen aus seinem bahn.de-Konto und übergibt sie an die Webseite Bahnkarte24, die im Browser berechnet, ob sich die BahnCard gelohnt hat.
 
 **Begründung je Berechtigung:**
 

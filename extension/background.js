@@ -1,4 +1,4 @@
-// SparSchiene – Hintergrund: öffnet den bahn.de-Tab und reicht Nachrichten an die Auswertungsseite weiter.
+// Bahnkarte24 – Hintergrund: öffnet den bahn.de-Tab und reicht Nachrichten an die Auswertungsseite weiter.
 // Der Zustand liegt in storage.session, weil der Service Worker zwischendurch beendet werden kann.
 const START_URL = 'https://www.bahn.de/buchung/kundenkonto/bahncard';
 const SITE_URL = 'https://xsebo99.github.io/SparSchiene/';

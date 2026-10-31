@@ -1,4 +1,4 @@
-# SparSchiene – Designsystem
+# Bahnkarte24 – Designsystem
 
 Quelle der Wahrheit für Werte ist `styles.css` (`:root` und der Dark-Mode-Block). Diese Datei hält die **Entscheidungen** fest, damit neue Teile dazu passen.
 

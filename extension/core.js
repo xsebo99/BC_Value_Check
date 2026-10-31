@@ -1,4 +1,4 @@
-// SparSchiene – gemeinsame Sammel-Logik für Lesezeichen (collector.js) und Browser-Erweiterung.
+// Bahnkarte24 – gemeinsame Sammel-Logik für Lesezeichen (collector.js) und Browser-Erweiterung.
 // Läuft auf www.bahn.de mit dem Login-Token aus sessionStorage. Liest BahnCard(s) und vergangene Aufträge
 // über die Schnittstellen, die bahn.de selbst nutzt, und reduziert sie auf das Nötige (keine Namen, Adressen, E-Mails).
 // Wichtig: Wird fürs Lesezeichen in eine Zeile gepackt – nur ganze Kommentarzeilen, überall Semikolons.

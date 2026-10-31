@@ -1,4 +1,4 @@
-// SparSchiene – Lesezeichen (Bookmarklet).
+// Bahnkarte24 – Lesezeichen (Bookmarklet).
 // Läuft auf www.bahn.de im eingeloggten Zustand, sammelt mit bcSammeln() aus core.js und schickt das Ergebnis
 // per postMessage an das Auswertungsfenster. Nichts wird an einen Server geschickt.
 // Beim Erzeugen des Lesezeichens (app.js) wird '__SITE__' durch die Adresse der Auswertungsseite und
@@ -9,18 +9,18 @@ void (async () => {
   /*__CORE__*/
 
   if (location.hostname !== 'www.bahn.de') {
-    alert('SparSchiene: Bitte öffne zuerst www.bahn.de, melde dich an und klicke dann erneut auf das Lesezeichen.');
+    alert('Bahnkarte24: Bitte öffne zuerst www.bahn.de, melde dich an und klicke dann erneut auf das Lesezeichen.');
     return;
   }
   let token;
   try { token = JSON.parse(sessionStorage.getItem('token')).accessToken; } catch (e) { /* nicht eingeloggt */ }
   if (!token) {
-    alert('SparSchiene: Du bist auf bahn.de nicht angemeldet. Bitte melde dich an und klicke dann erneut auf das Lesezeichen.');
+    alert('Bahnkarte24: Du bist auf bahn.de nicht angemeldet. Bitte melde dich an und klicke dann erneut auf das Lesezeichen.');
     return;
   }
 
   // Fenster sofort öffnen (noch im Klick), sonst blockt der Popup-Blocker.
-  const win = window.open(SITE + '/#import', 'sparschiene');
+  const win = window.open(SITE + '/#import', 'bahnkarte24');
   let ready = false;
   let last = null;
   const send = (msg) => {
@@ -46,12 +46,12 @@ void (async () => {
       // Popup blockiert oder geschlossen: Daten als Datei anbieten.
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([JSON.stringify(daten)], { type: 'application/json' }));
-      a.download = 'sparschiene-daten.json';
+      a.download = 'bahnkarte24-daten.json';
       a.click();
-      alert('SparSchiene: Das Auswertungsfenster war blockiert. Deine Daten wurden als Datei gespeichert – lade sie auf ' + SITE + ' hoch.');
+      alert('Bahnkarte24: Das Auswertungsfenster war blockiert. Deine Daten wurden als Datei gespeichert – lade sie auf ' + SITE + ' hoch.');
     }
   } catch (err) {
     send({ type: 'bc-error', text: err.message || String(err) });
-    if (!win || win.closed) alert('SparSchiene: ' + (err.message || err));
+    if (!win || win.closed) alert('Bahnkarte24: ' + (err.message || err));
   }
 })();

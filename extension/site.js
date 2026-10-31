@@ -1,4 +1,4 @@
-// SparSchiene – Brücke zwischen Auswertungsseite und Erweiterung (läuft auf der Auswertungsseite).
+// Bahnkarte24 – Brücke zwischen Auswertungsseite und Erweiterung (läuft auf der Auswertungsseite).
 const QUELLE = 'bc-erweiterung';
 const hallo = () => window.postMessage({ type: 'bc-ext-hallo', quelle: QUELLE, version: chrome.runtime.getManifest().version }, location.origin);
 

@@ -1,7 +1,7 @@
 // Baut die Erweiterung für den Chrome Web Store.
 // 1. kopiert core.js nach extension/core.js (damit Lesezeichen und Erweiterung dieselbe Logik nutzen),
 // 2. stellt in dist/extension eine Store-Fassung zusammen (ohne localhost-Adressen),
-// 3. packt sie als dist/sparschiene-<version>.zip.
+// 3. packt sie als dist/bahnkarte24-<version>.zip.
 // Aufruf: node tools/build-extension.mjs   (mit --check nur prüfen, ob extension/core.js aktuell ist)
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -35,7 +35,7 @@ mkdirSync(out, { recursive: true });
 cpSync(EXT, out, { recursive: true });
 writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
-const zip = join(DIST, `sparschiene-${manifest.version}.zip`);
+const zip = join(DIST, `bahnkarte24-${manifest.version}.zip`);
 if (process.platform === 'win32') {
   // Nicht Compress-Archive: Windows PowerShell 5.1 schreibt Backslashes in die Pfade, die der Web Store nicht findet.
   const tar = join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe');
