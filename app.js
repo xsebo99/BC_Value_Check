@@ -7,7 +7,12 @@ const BAHN_ORIGIN = 'https://www.bahn.de';
 const STORE_KEY = 'sparschiene-daten';
 
 // Listenpreise laut bahn.de, Stand Oktober 2026 (2. Klasse). In der Auswertung änderbar.
-const LISTENPREIS = { BC25: 62.90, MYBC25: 39.90, BC50: 244, BC100: 4899 };
+// Listenpreise 2. Klasse laut bahn.de/angebot/bahncard (Stand Oktober 2026), je Kartenvariante
+const LISTENPREIS = {
+  BC25: { normal: 62.90, my: 39.90, senioren: 40.90, ermaessigt: 40.90, probe: 19.90, jugend: 0 },
+  BC50: { normal: 244, my: 79.90, senioren: 122, ermaessigt: 122, probe: 76.90 },
+  BC100: { normal: 4899, my: 3199, probe: 1459 },
+};
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const eur = (n) => (n || 0).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -220,11 +225,28 @@ function defaultCard(cards) {
   return best;
 }
 
+// Variante aus Produktcode und -name; Probe-Karten erkennt man auch an der kurzen Laufzeit
+function kartenVariante(card) {
+  if (!card) return 'normal';
+  const s = ((card.code || '') + ' ' + (card.produkt || '')).toUpperCase().replace(/\s+/g, '');
+  if (s.includes('JUGEND')) return 'jugend';
+  if (s.includes('PROBE') || (card.ab && card.bis && tag(card.bis) - tag(card.ab) < 120 * 864e5)) return 'probe';
+  if (s.includes('MYBAHNCARD') || s.includes('MYBC')) return 'my';
+  if (s.includes('SENIOR')) return 'senioren';
+  if (card.ermaessigt) return 'ermaessigt';
+  return 'normal';
+}
+
+function listenPreis(typ, variante) {
+  const t = LISTENPREIS[typ];
+  if (!t) return 0;
+  // Jugend gibt es nur als BC 25 – für 50/100 gilt dann der My-Preis
+  if (t[variante] == null && variante === 'jugend') return t.my != null ? t.my : t.normal;
+  return t[variante] != null ? t[variante] : t.normal;
+}
+
 function kartenPreis(card) {
-  if (!card) return 0;
-  const code = (card.code || '').toUpperCase();
-  if (code.includes('MYBAHNCARD25')) return LISTENPREIS.MYBC25;
-  return LISTENPREIS[card.typ] || 0;
+  return card ? listenPreis(card.typ, kartenVariante(card)) : 0;
 }
 
 function kartenName(card) {
@@ -277,9 +299,9 @@ function render() {
   const typ = card ? card.typ : null;
   const meinPreis = state.preise.mein != null ? state.preise.mein : kartenPreis(card);
   const preise = {
-    bc25: state.preise.bc25 != null ? state.preise.bc25 : (card && /MYBAHNCARD25/i.test(card.code || '') ? LISTENPREIS.MYBC25 : LISTENPREIS.BC25),
-    bc50: state.preise.bc50 != null ? state.preise.bc50 : LISTENPREIS.BC50,
-    bc100: state.preise.bc100 != null ? state.preise.bc100 : LISTENPREIS.BC100,
+    bc25: state.preise.bc25 != null ? state.preise.bc25 : listenPreis('BC25', kartenVariante(card)),
+    bc50: state.preise.bc50 != null ? state.preise.bc50 : listenPreis('BC50', kartenVariante(card)),
+    bc100: state.preise.bc100 != null ? state.preise.bc100 : listenPreis('BC100', kartenVariante(card)),
   };
   if (typ === 'BC25') preise.bc25 = meinPreis;
   if (typ === 'BC50') preise.bc50 = meinPreis;
@@ -325,7 +347,7 @@ function render() {
     ${d.bahncards.length ? `<label class="field">Deine BahnCard<select id="sel-card">${cardOptions}</select></label>` : '<p class="toolbar__note">Keine BahnCard im Konto gefunden – wir rechnen mit den letzten 12 Monaten.</p>'}
     ${card ? `<label class="field">Kartenpreis in €<input id="inp-preis" type="number" min="0" step="0.01" value="${meinPreis.toFixed(2)}"></label>` : ''}
     ${card && card.klasse === 'KLASSE_1' ? '<p class="toolbar__note">1.-Klasse-Karte: Bitte prüfe den Kartenpreis – voreingestellt ist der Preis der 2. Klasse.</p>' : ''}
-    ${card && card.ermaessigt ? '<p class="toolbar__note">Ermäßigte Karte: Bitte trage deinen tatsächlichen Kartenpreis ein.</p>' : ''}
+    ${card && card.ermaessigt ? '<p class="toolbar__note">Ermäßigte Karte: Voreingestellt ist der ermäßigte Listenpreis – bitte prüfen.</p>' : ''}
   </div>`;
 
   // Urteil: die Karte füllt sich mit der Ersparnis bis zum Kartenpreis
