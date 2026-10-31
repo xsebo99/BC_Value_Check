@@ -118,6 +118,8 @@ const HERO_BEISPIELE = [
 ];
 const RUHIG = matchMedia('(prefers-reduced-motion: reduce)');
 const FLAP_ZEICHEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const FLAP_TAKT = 130;      // ms pro Blatt
+const HERO_WECHSEL = 2940; // ms zwischen 25 → 50 → 100
 
 // Blättert jede Zelle über ein paar Zufallszeichen zum Zielzeichen, leicht versetzt wie an der Tafel
 function flapZu(el, text, rechts = false) {
@@ -130,12 +132,12 @@ function flapZu(el, text, rechts = false) {
     clearInterval(zelle._flap);
     if (zelle.textContent === soll) return;
     if (RUHIG.matches) { zelle.textContent = soll; return; }
-    let schritte = 3 + i % 4 + Math.floor(Math.random() * 3);
+    let schritte = Math.round((3 + i % 4 + Math.floor(Math.random() * 3)) * 1.5);
     zelle._flap = setInterval(() => {
       zelle.textContent = --schritte > 0 ? FLAP_ZEICHEN[Math.floor(Math.random() * FLAP_ZEICHEN.length)] : soll;
       if (schritte <= 0) clearInterval(zelle._flap);
-      if (zelle.animate) zelle.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.35)', filter: 'brightness(.6)' }, { transform: 'scaleY(1)' }], { duration: 65, easing: 'ease-out' });
-    }, 65);
+      if (zelle.animate) zelle.animate([{ transform: 'scaleY(1)' }, { transform: 'scaleY(.35)', filter: 'brightness(.6)' }, { transform: 'scaleY(1)' }], { duration: FLAP_TAKT, easing: 'ease-out' });
+    }, FLAP_TAKT);
   });
 }
 
@@ -160,7 +162,7 @@ function setupHero() {
     if (document.hidden) return;
     i = (i + 1) % HERO_BEISPIELE.length;
     zeige(HERO_BEISPIELE[i]);
-  }, 4200);
+  }, HERO_WECHSEL);
 
   // Karte kippt leicht mit der Maus, der Glanz wandert mit
   const tilt = $('.hero__tilt');
