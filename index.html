@@ -9,7 +9,7 @@
   <link rel="icon" href="extension/icons/icon16.png" sizes="16x16">
   <link rel="apple-touch-icon" href="extension/icons/icon128.png">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
   <header class="top">
@@ -56,7 +56,7 @@
       <div class="wrap section">
       <section class="panel" id="so-gehts">
         <h2 class="h2">Ohne Erweiterung: in drei Schritten</h2>
-        <ol class="steps">
+        <ol class="steps nur-desktop">
           <li>
             <span class="steps__n">1</span>
             <h3>Lesezeichen anlegen</h3>
@@ -73,6 +73,28 @@
             <span class="steps__n">3</span>
             <h3>Lesezeichen anklicken</h3>
             <p class="muted">Die Auswertung öffnet sich, ca. 2 Sekunden pro Buchung.</p>
+          </li>
+        </ol>
+
+        <ol class="steps nur-mobil">
+          <li>
+            <span class="steps__n">1</span>
+            <h3>Code kopieren</h3>
+            <p class="muted">Das ist dein Lesezeichen.</p>
+            <button class="btn" id="btn-copy" type="button">Lesezeichen-Code kopieren</button>
+          </li>
+          <li>
+            <span class="steps__n">2</span>
+            <h3>Lesezeichen anlegen</h3>
+            <p class="muted nur-ios">Teilen → „Lesezeichen hinzufügen“, Name „SparSchiene“. Dann unter Lesezeichen → Bearbeiten die Adresse durch den Code ersetzen.</p>
+            <p class="muted nur-android">Für diese Seite ein Lesezeichen setzen (☆), dann Bearbeiten: Name „SparSchiene“, URL durch den Code ersetzen.</p>
+          </li>
+          <li>
+            <span class="steps__n">3</span>
+            <h3>Auf bahn.de starten</h3>
+            <p class="muted"><a href="https://www.bahn.de/buchung/reiseuebersicht/vergangene" target="_blank" rel="noopener">Meine Reisen</a> öffnen und einloggen.
+              <span class="nur-ios">Dann Lesezeichen öffnen und „SparSchiene“ antippen.</span>
+              <span class="nur-android">Dann „SparSchiene“ in die Adresszeile tippen und das Lesezeichen wählen.</span></p>
           </li>
         </ol>
 
@@ -147,6 +169,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

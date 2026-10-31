@@ -42,8 +42,37 @@ function reset() {
 // ---------------------------------------------------------------------------
 // Lesezeichen erzeugen
 // ---------------------------------------------------------------------------
+// Touch-Geräte bekommen die Handy-Anleitung (kopieren statt ziehen)
+const MOBIL = matchMedia('(pointer: coarse)').matches;
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+async function kopieren(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* ältere Browser */ }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  const ok = document.execCommand('copy');
+  ta.remove();
+  return ok;
+}
+
 async function setupBookmarklet() {
   const link = $('#bookmarklet');
+  if (MOBIL) {
+    document.body.classList.add('is-mobil');
+    if (IOS) document.body.classList.add('is-ios');
+    $('#so-gehts h2').textContent = 'Am Handy: in drei Schritten';
+  }
+  const copyBtn = $('#btn-copy');
+  copyBtn.addEventListener('click', async () => {
+    if (!link.href.startsWith('javascript:')) return;
+    const ok = await kopieren(link.href);
+    copyBtn.textContent = ok ? 'Kopiert ✓' : 'Kopieren fehlgeschlagen';
+    setTimeout(() => { copyBtn.textContent = 'Lesezeichen-Code kopieren'; }, 2500);
+  });
   link.addEventListener('click', (e) => {
     e.preventDefault();
     alert('Zieh den Button in deine Lesezeichenleiste und klick ihn dann auf bahn.de an.');
