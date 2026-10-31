@@ -18,7 +18,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 > Hat sich deine BahnCard gelohnt? SparSchiene rechnet es mit deinen echten Fahrten von bahn.de nach – mit einem Klick.
 >
 > So funktioniert's:
-> 1. Öffne https://xsebo99.github.io/BC_Value_Check/ und klicke auf „Meine Fahrten von bahn.de holen“.
+> 1. Öffne https://xsebo99.github.io/SparSchiene/ und klicke auf „Meine Fahrten von bahn.de holen“.
 > 2. bahn.de öffnet sich in einem neuen Tab. Melde dich an, falls nötig.
 > 3. Die Erweiterung liest deine BahnCard und deine vergangenen Buchungen und bringt dich zur Auswertung zurück.
 >
@@ -32,12 +32,12 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 > • Kein Server, kein Konto, kein Tracking – die Auswertung läuft komplett in deinem Browser.
 > • Gelesen werden nur Fahrt- und Preisdaten; Namen, Adressen und Zahlungsdaten werden nicht übernommen.
 > • Die Erweiterung liest nur und ändert nichts an deinen Buchungen.
-> • Quellcode: https://github.com/xsebo99/BC_Value_Check
+> • Quellcode: https://github.com/xsebo99/SparSchiene
 >
 > SparSchiene ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.
 
-**Website:** https://xsebo99.github.io/BC_Value_Check/
-**Support-URL:** https://github.com/xsebo99/BC_Value_Check/issues
+**Website:** https://xsebo99.github.io/SparSchiene/
+**Support-URL:** https://github.com/xsebo99/SparSchiene/issues
 
 ## Grafiken
 
@@ -60,7 +60,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 - **Host-Berechtigung https://www.bahn.de/*:**
   > Nur in dem Tab, den die Erweiterung auf Klick des Nutzers selbst öffnet, werden nach der Anmeldung des Nutzers seine BahnCard und vergangenen Buchungen über die Schnittstellen gelesen, die bahn.de selbst für „Meine Reisen“ nutzt. In allen anderen bahn.de-Tabs tut die Erweiterung nichts. Es wird nichts verändert oder gebucht.
 
-- **Host-Berechtigung https://xsebo99.github.io/BC_Value_Check/*:**
+- **Host-Berechtigung https://xsebo99.github.io/SparSchiene/*:**
   > Auf der eigenen Auswertungsseite zeigt die Erweiterung den Ein-Klick-Button an und übergibt die gelesenen Daten an die Seite, die sie lokal im Browser auswertet.
 
 **Remote Code:** Nein, die Erweiterung lädt und führt keinen externen Code aus.
@@ -78,7 +78,7 @@ Alle drei Zusicherungen bestätigen:
 - ☑ Ich verwende oder übertrage Nutzerdaten nicht für Zwecke, die nichts mit dem alleinigen Zweck des Artikels zu tun haben.
 - ☑ Ich verwende oder übertrage Nutzerdaten nicht, um die Kreditwürdigkeit zu ermitteln oder für Darlehenszwecke.
 
-**Datenschutzerklärung (URL):** https://xsebo99.github.io/BC_Value_Check/datenschutz.html
+**Datenschutzerklärung (URL):** https://xsebo99.github.io/SparSchiene/datenschutz.html
 
 ## Neue Version veröffentlichen
 
