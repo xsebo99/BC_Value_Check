@@ -532,6 +532,22 @@ tbody tr:last-child td { border-bottom: 0; }
 /* Euro-Beträge zählen hoch – feste Ziffernbreite, damit nichts wackelt */
 .zahl { font-variant-numeric: tabular-nums; }
 
+/* Diagramme bauen sich auf, sobald sie ins Bild kommen (app.js setzt .anim, dann .ist-sichtbar).
+   Die Animationen warten pausiert im Startzustand und laufen erst mit .ist-sichtbar los. */
+.anim .line { stroke-dasharray: 1; animation: zeichnen 1.6s cubic-bezier(.45, 0, .2, 1) both paused; }
+.anim .area { animation: einblenden .9s .5s ease both paused; }
+.anim .ref, .anim .ref-label { animation: einblenden .6s .2s ease both paused; }
+.anim .dot { transform-box: fill-box; transform-origin: center; animation: punkt .45s calc(var(--t, 0) * 1.5s + .1s) cubic-bezier(.3, 1.6, .5, 1) both paused; }
+.anim .bar { transform-box: fill-box; transform-origin: bottom; animation: wachsen .7s calc(var(--i, 0) * 45ms) cubic-bezier(.2, .75, .15, 1) both paused; }
+.anim .bar--gespart { animation-delay: calc(var(--i, 0) * 45ms + .3s); }
+.anim .hbar__fill { transform-origin: left; animation: wachsen-x .9s calc(var(--i, 0) * 80ms + .1s) cubic-bezier(.2, .75, .15, 1) both paused; }
+.anim.ist-sichtbar :is(.line, .area, .ref, .ref-label, .dot, .bar, .hbar__fill) { animation-play-state: running; }
+@keyframes zeichnen { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes einblenden { from { opacity: 0; } }
+@keyframes punkt { from { transform: scale(0); opacity: 0; } }
+@keyframes wachsen { from { transform: scaleY(0); } }
+@keyframes wachsen-x { from { transform: scaleX(0); } }
+
 /* Auftauchen: beim Laden gleiten Hero, Karte und Panels leicht versetzt von unten herein */
 @keyframes auftauchen { from { opacity: 0; transform: translateY(22px); } }
 .hero__text > *, .hero__card, #so-gehts, .info > .panel, #view-result.ist-neu .result > * {

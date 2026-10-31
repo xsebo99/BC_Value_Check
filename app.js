@@ -189,12 +189,14 @@ function zaehleHero(von, nach, dauer = 1200) {
   ], { duration: dauer * .8, easing: 'cubic-bezier(.2, .75, .15, 1)' });
 }
 
-// Euro-Beträge der Auswertung: zahl() schreibt sie mit Zielwert ins HTML, zahlenZaehlen() lässt sie hinlaufen –
+// Zahlen der Auswertung (Beträge, Fahrtbeleg): zahl() schreibt sie mit Zielwert ins HTML, zahlenZaehlen() lässt sie hinlaufen –
 // beim ersten Mal von 0, danach vom zuletzt gezeigten Wert (z. B. beim Wechsel der Kartenvariante).
 const ZAHL_FORMAT = {
   eur,
   eur0,
   saldo: (v) => (Math.round(v * 100) >= 0 ? '+' : '−') + eur(Math.abs(v)),
+  int,
+  ct: (v) => v.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' ct',
 };
 
 function zahl(key, wert, format = 'eur') {
@@ -224,6 +226,24 @@ function zahlenZaehlen(root, dauer = 1100) {
   }, { threshold: 0.6 });
   for (const z of els) beobachter.observe(z.el);
   zahlenZaehlen.beobachter = beobachter;
+}
+
+// Diagramme bauen sich auf, wenn sie ins Bild kommen: Kurve zeichnet sich, Balken wachsen.
+// Die Animation steht in styles.css (.anim), hier wird sie nur zum richtigen Zeitpunkt gestartet.
+function grafikenZeigen(root) {
+  if (grafikenZeigen.beobachter) grafikenZeigen.beobachter.disconnect();
+  if (RUHIG.matches || !window.IntersectionObserver) return;
+  const neu = [...root.querySelectorAll('[data-anim]')].filter((el) => !state.gesehen.has(el.dataset.anim));
+  const beobachter = new IntersectionObserver((eintraege) => {
+    for (const e of eintraege) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add('ist-sichtbar');
+      state.gesehen.add(e.target.dataset.anim);
+      beobachter.unobserve(e.target);
+    }
+  }, { threshold: 0.35 });
+  for (const el of neu) { el.classList.add('anim'); beobachter.observe(el); }
+  grafikenZeigen.beobachter = beobachter;
 }
 
 // Lässt eine Gruppe Beträge gemeinsam hinlaufen; gibt eine Stopp-Funktion zurück.
@@ -321,6 +341,7 @@ function loadData(d, persist) {
   state.cardIdx = defaultCard(d.bahncards);
   state.preise = {};
   state.zahlen = {};
+  state.gesehen = new Set();
   // Ohne Karte: Klasse nach den meisten Fahrten vorwählen
   const alle = fahrten(d);
   state.klasse = alle.filter((x) => x.klasse === 1).length > alle.length / 2 ? 1 : 2;
@@ -462,7 +483,8 @@ function topN(arr, key, n = 3) {
 // ---------------------------------------------------------------------------
 // variante/klasse gelten nur, wenn keine Karte im Konto ist
 // zahlen: zuletzt gezeigte Euro-Beträge je Schlüssel – von dort zählt die nächste Darstellung weiter
-const state = { data: null, cardIdx: -1, preise: {}, variante: 'normal', klasse: 2, zahlen: {} };
+// gesehen: Diagramme, die schon einmal ins Bild kamen – die bauen sich beim Umschalten nicht neu auf
+const state = { data: null, cardIdx: -1, preise: {}, variante: 'normal', klasse: 2, zahlen: {}, gesehen: new Set() };
 
 function render() {
   const d = state.data;
@@ -641,8 +663,8 @@ function render() {
 
   // Statistik als Fahrtbeleg: die Strecke führt, der Rest steht wie auf einer Quittung
   const posten = [
-    ['Ausgegeben', { html: zahl('ausgegeben', ausgegeben) }, liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : ''],
-    ['Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: etwa 30–50 ct/km'],
+    ['Ausgegeben', { html: zahl('ausgegeben', ausgegeben) }, liste.length ? { html: `Ø ${zahl('schnitt', ausgegeben / liste.length)} pro Fahrt` } : ''],
+    ['Preis pro km', ctProKm ? { html: zahl('ctprokm', ctProKm, 'ct') } : '–', 'Auto: etwa 30–50 ct/km'],
     ['Teuerste Fahrt', teuerste ? { html: zahl('teuerste', teuerste.preis) } : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : ''],
     ['Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}-mal gefahren` : ''],
     ['Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}-mal` : ''],
@@ -654,14 +676,14 @@ function render() {
     <div class="beleg">
       <div>
         <div class="beleg__label">Mit der Bahn gefahren</div>
-        <div class="beleg__zahl">${int(km)} km</div>
+        <div class="beleg__zahl">${zahl('km', km, 'int')} km</div>
         <div class="beleg__sub">
-          <span><strong>${int(liste.length)}</strong> Fahrten</span>
-          <span><strong>${int(stunden)} h</strong> im Zug</span>
-          <span><strong>${int(new Set(liste.map((x) => x.nr)).size)}</strong> Buchungen</span>
+          <span><strong>${zahl('fahrten', liste.length, 'int')}</strong> Fahrten</span>
+          <span><strong>${zahl('stunden', Math.round(stunden), 'int')} h</strong> im Zug</span>
+          <span><strong>${zahl('buchungen', new Set(liste.map((x) => x.nr)).size, 'int')}</strong> Buchungen</span>
         </div>
       </div>
-      <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${w.html || esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
+      <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${w.html || esc(w)}${s ? `<small>${s.html || esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
     </div>
   </section>`;
 
@@ -692,6 +714,7 @@ function render() {
   const offen = root.querySelector('.trips[open]');
   root.innerHTML = html;
   zahlenZaehlen(root);
+  grafikenZeigen(root);
   if (offen) root.querySelector('.trips').open = true;
   bind(root);
   // Karte erst leer zeichnen, dann füllen – beim ersten Anzeigen sieht man sie volllaufen.
@@ -724,7 +747,7 @@ function tarifBars(liste) {
   }
   const rows = [...m.entries()].sort((a, b) => b[1].sum - a[1].sum);
   const max = Math.max(1, ...rows.map(([, v]) => v.sum));
-  return `<div class="hbars">${rows.map(([k, v]) => `<div class="hbar">
+  return `<div class="hbars" data-anim="tarif">${rows.map(([k, v], i) => `<div class="hbar" style="--i:${i}">
     <div class="hbar__head"><span>${esc(k)}</span><span class="hbar__val">${eur0(v.sum)} · ${v.n}×</span></div>
     <span class="hbar__track"><span class="hbar__fill" style="width:${(v.sum / max) * 100}%"></span></span></div>`).join('') || '<p class="muted">Keine Daten.</p>'}</div>`;
 }
@@ -754,12 +777,12 @@ function chartKurve(kurve, von, bis, preis, heute) {
   const months = [];
   const m = new Date(von.getFullYear(), von.getMonth() + 1, 1);
   while (m <= bis) { months.push(new Date(m)); m.setMonth(m.getMonth() + 2); }
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kumulierte Ersparnis">
+  return `<svg class="chart" data-anim="kurve" viewBox="0 0 ${W} ${H}" role="img" aria-label="Kumulierte Ersparnis">
     ${ticks.map((t) => `<line class="grid" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${PAD.l - 8}" y="${y(t) + 4}" text-anchor="end">${eur0(t)}</text>`).join('')}
     ${months.map((d) => `<text x="${x(d)}" y="${H - 8}" text-anchor="middle">${d.toLocaleDateString('de-DE', { month: 'short' })}</text>`).join('')}
     ${heute < bis ? `<line class="today" x1="${x(heute)}" x2="${x(heute)}" y1="${PAD.t}" y2="${H - PAD.b}"/><text x="${x(heute) + 4}" y="${PAD.t + 10}">heute</text>` : ''}
     <path class="area" d="${area}"/>
-    <path class="line" d="${path}"/>
+    <path class="line" d="${path}" pathLength="1"/>
     <line class="ref" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(preis)}" y2="${y(preis)}"/>
     <text class="ref-label" x="${W - PAD.r}" y="${y(preis) - 6}" text-anchor="end">Kartenpreis ${eur(preis)}</text>
     ${kurve.map((p, i) => {
@@ -767,7 +790,7 @@ function chartKurve(kurve, von, bis, preis, heute) {
       const px = x(p.datum);
       const links = i ? (x(kurve[i - 1].datum) + px) / 2 : Math.max(PAD.l, px - 12);
       const rechts = i < kurve.length - 1 ? (px + x(kurve[i + 1].datum)) / 2 : Math.min(W - PAD.r, px + 12);
-      return `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><rect class="hit" x="${links}" y="${PAD.t}" width="${Math.max(rechts - links, 1)}" height="${H - PAD.t - PAD.b}"/><line class="guide" x1="${px}" x2="${px}" y1="${PAD.t}" y2="${H - PAD.b}"/><circle class="dot" cx="${px}" cy="${y(p.kum)}" r="4"/></g>`;
+      return `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><rect class="hit" x="${links}" y="${PAD.t}" width="${Math.max(rechts - links, 1)}" height="${H - PAD.t - PAD.b}"/><line class="guide" x1="${px}" x2="${px}" y1="${PAD.t}" y2="${H - PAD.b}"/><circle class="dot" cx="${px}" cy="${y(p.kum)}" r="4" style="--t:${((px - PAD.l) / (W - PAD.l - PAD.r)).toFixed(3)}"/></g>`;
     }).join('')}
     <line class="axis" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(0)}" y2="${y(0)}"/>
   </svg>`;
@@ -789,7 +812,7 @@ function chartMonate(liste, von, bis) {
   const ticks = [0, ymax / 2, ymax];
   const barW = Math.max(4, Math.min(28, bw - 6));
   const rund = (x0, x1, top, unten, r) => `M${x0},${unten} V${top + r} Q${x0},${top} ${x0 + r},${top} H${x1 - r} Q${x1},${top} ${x1},${top + r} V${unten} Z`;
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ausgaben und Ersparnis pro Monat">
+  return `<svg class="chart" data-anim="monate" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ausgaben und Ersparnis pro Monat">
     ${ticks.map((t) => `<line class="grid" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${PAD.l - 8}" y="${y(t) + 4}" text-anchor="end">${eur0(t)}</text>`).join('')}
     ${months.map((o, i) => {
       const cx = PAD.l + bw * i + bw / 2;
@@ -804,7 +827,7 @@ function chartMonate(liste, von, bis) {
         bars += `<path class="bar" d="${rund(x0, x1, yBez, y(0), Math.min(r, (y(0) - yBez) / 2))}"/>`;
       }
       const label = months.length <= 13 || i % 2 === 0 ? `<text x="${cx}" y="${H - 8}" text-anchor="middle">${o.d.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '')}</text>` : '';
-      return `<g data-tip="${esc(`${o.d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}<br>${eur(o.sum)} bezahlt · ${o.n} ${o.n === 1 ? 'Fahrt' : 'Fahrten'}${o.gespart ? `<br>${eur(o.gespart)} durch BahnCard gespart` : ''}`)}"><rect class="hit" x="${cx - bw / 2}" y="${PAD.t}" width="${bw}" height="${H - PAD.t - PAD.b}"/>${bars}</g>${label}`;
+      return `<g data-tip="${esc(`${o.d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}<br>${eur(o.sum)} bezahlt · ${o.n} ${o.n === 1 ? 'Fahrt' : 'Fahrten'}${o.gespart ? `<br>${eur(o.gespart)} durch BahnCard gespart` : ''}`)}"><rect class="hit" x="${cx - bw / 2}" y="${PAD.t}" width="${bw}" height="${H - PAD.t - PAD.b}"/><g style="--i:${i}">${bars}</g></g>${label}`;
     }).join('')}
     <line class="axis" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(0)}" y2="${y(0)}"/>
   </svg>`;
