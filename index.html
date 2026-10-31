@@ -5,140 +5,149 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BahnCard-Bilanz – hat sich deine BahnCard gelohnt?</title>
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='6' width='28' height='20' rx='4' fill='%23e30613'/%3E%3Ctext x='16' y='21.5' font-family='Arial' font-weight='700' font-size='13' fill='white' text-anchor='middle'%3E%25%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="extension/icons/icon32.png">
+  <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap topbar__inner">
-      <a class="brand" href="./">
+  <header class="top">
+    <div class="wrap top__inner">
+      <a class="brand" href="./" aria-label="BahnCard-Bilanz – Startseite">
         <span class="brand__logo" aria-hidden="true">%</span>
-        <span>
-          <span class="brand__title">BahnCard-Bilanz</span>
-          <span class="brand__sub">Hat sich deine BahnCard gelohnt?</span>
-        </span>
+        <span class="brand__name">BahnCard-Bilanz</span>
       </a>
-      <button class="pill pill--light hidden" id="btn-reset" type="button">Neu starten</button>
+      <nav class="top__nav" aria-label="Seitennavigation">
+        <a href="./#so-gehts">So geht's</a>
+        <a href="./#faq">FAQ</a>
+        <a href="./#datenschutz">Datenschutz</a>
+        <button class="btn btn--quiet hidden" id="btn-reset" type="button">Neu starten</button>
+      </nav>
     </div>
   </header>
-  <nav class="subnav">
-    <div class="wrap subnav__inner">
-      <a href="#so-gehts">So geht's</a>
-      <a href="#datenschutz">Datenschutz</a>
-      <a href="#faq">FAQ</a>
-    </div>
-  </nav>
 
-  <main class="wrap" id="main">
+  <main id="main">
     <!-- Start -->
     <section id="view-start">
-      <div class="card hero">
-        <div class="hero__rule" aria-hidden="true"></div>
-        <h1 class="hero__title">Hat sich deine BahnCard gelohnt?</h1>
-        <p class="hero__lead">Rechne es mit deinen <strong>echten Fahrten</strong> von bahn.de nach.</p>
-        <p class="muted">Ersparnis, Break-even, verschenkte Rabatte, BahnCard 25 vs. 50 vs. 100 – und ein paar Statistiken obendrauf.</p>
-        <div class="hero__actions">
-          <a class="btn" href="#so-gehts">Los geht's</a>
-          <button class="btn btn--ghost" id="btn-demo" type="button">Demo ansehen</button>
+      <div class="wrap hero">
+        <div class="hero__text">
+          <p class="eyebrow">Für BahnCard 25, 50 und 100</p>
+          <h1 class="display">Hat sich deine BahnCard gelohnt?</h1>
+          <p class="lead">Rechne es mit deinen echten Fahrten von bahn.de nach: wie viel du gespart hast, ab wann die Karte bezahlt war und ob eine andere besser gepasst hätte.</p>
+
+          <div class="hero__actions">
+            <button class="btn btn--big ext-only" id="btn-ext" type="button">Meine Fahrten von bahn.de holen</button>
+            <a class="btn btn--big no-ext" href="#so-gehts">Los geht's</a>
+            <button class="btn btn--ghost btn--big" id="btn-demo" type="button">Demo ansehen</button>
+          </div>
+          <p class="hero__trust small muted hidden" id="ext-card">bahn.de öffnet sich in einem neuen Tab. Melde dich dort an, falls nötig – den Rest erledigt die Erweiterung.</p>
+          <p class="hero__trust small muted">Kein Server, kein Konto, kein Tracking – deine Daten bleiben in diesem Tab.</p>
+        </div>
+
+        <div class="hero__card" aria-hidden="true">
+          <div class="bc bc--preview" style="--fill: .64">
+            <div class="bc__fill"></div>
+            <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">BahnCard 25</span></div>
+            <div class="bc__amount">?</div>
+            <div class="bc__bottom"><span>gespart bis zum Kartenpreis</span><span class="bc__pct">64 %</span></div>
+          </div>
         </div>
       </div>
 
-      <div class="card hidden" id="ext-card">
-        <h2>Erweiterung erkannt – ein Klick genügt</h2>
-        <p class="muted">Es öffnet sich bahn.de in einem neuen Tab. Melde dich dort an, falls nötig – den Rest erledigt die Erweiterung und bringt dich mit der Auswertung hierher zurück.</p>
-        <div class="hero__actions">
-          <button class="btn" id="btn-ext" type="button">Meine Fahrten von bahn.de holen</button>
-        </div>
-      </div>
-
-      <div class="card" id="so-gehts">
-        <h2>So geht's – in 3 Schritten</h2>
+      <section class="wrap section" id="so-gehts">
+        <p class="eyebrow">Ohne Installation</p>
+        <h2 class="h2">Ohne Erweiterung: in drei Schritten</h2>
         <ol class="steps">
           <li>
             <span class="steps__n">1</span>
-            <div>
-              <strong>Lesezeichen anlegen.</strong> Zieh diesen Button in deine Lesezeichenleiste:
-              <div class="bookmarklet-row">
-                <a class="bookmarklet" id="bookmarklet" href="#" title="In die Lesezeichenleiste ziehen">BahnCard-Bilanz holen</a>
-                <span class="muted small">← ziehen, nicht klicken</span>
-              </div>
-              <p class="muted small" id="bookmarklet-hint">Keine Lesezeichenleiste? <kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>B</kbd> (Mac: <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>B</kbd>).</p>
-            </div>
+            <h3>Lesezeichen anlegen</h3>
+            <p class="muted">Zieh diesen Button in deine Lesezeichenleiste.</p>
+            <a class="bookmarklet" id="bookmarklet" href="#" title="In die Lesezeichenleiste ziehen">BahnCard-Bilanz holen</a>
+            <p class="small muted" id="bookmarklet-hint">Keine Leiste zu sehen? <kbd>Strg</kbd> + <kbd>Umschalt</kbd> + <kbd>B</kbd></p>
           </li>
           <li>
             <span class="steps__n">2</span>
-            <div><strong>Auf bahn.de anmelden.</strong> Öffne <a href="https://www.bahn.de/buchung/reiseuebersicht/vergangene" target="_blank" rel="noopener">bahn.de → Meine Reisen</a> und logg dich ein.</div>
+            <h3>Bei bahn.de anmelden</h3>
+            <p class="muted">Öffne <a href="https://www.bahn.de/buchung/reiseuebersicht/vergangene" target="_blank" rel="noopener">Meine Reisen auf bahn.de</a> und logg dich ein.</p>
           </li>
           <li>
             <span class="steps__n">3</span>
-            <div><strong>Lesezeichen anklicken.</strong> Es öffnet sich diese Seite und deine Fahrten werden eingelesen (dauert ca. 2 Sekunden pro Buchung – bahn.de mag keine Eile).</div>
+            <h3>Lesezeichen anklicken</h3>
+            <p class="muted">Diese Seite öffnet sich und liest deine Fahrten ein – etwa zwei Sekunden pro Buchung.</p>
           </li>
         </ol>
-        <details class="details">
-          <summary>Was macht das Lesezeichen genau?</summary>
-          <p>Es liest auf bahn.de – mit deiner bestehenden Anmeldung – deine BahnCard und deine vergangenen Buchungen über dieselben Schnittstellen, die auch „Meine Reisen“ nutzt. Daraus behält es nur Datum, Strecke, Tarif, Preis, BahnCard-Ersparnis und Zugabschnitte. Namen, Adressen, E-Mail und Zahlungsdaten werden nicht übernommen. Die Daten gehen direkt von Browserfenster zu Browserfenster – es gibt keinen Server.</p>
-          <p><a href="collector.js" target="_blank" rel="noopener">Quelltext des Lesezeichens ansehen</a></p>
-        </details>
-      </div>
 
-      <div class="card card--dashed">
-        <h3>Datei statt Lesezeichen?</h3>
-        <p class="muted small">Falls das Fenster blockiert wurde, hat das Lesezeichen eine Datei <code>bahncard-bilanz-daten.json</code> gespeichert. Die kannst du hier laden.</p>
-        <label class="btn btn--ghost btn--small">
-          Datei auswählen
-          <input type="file" id="file-input" accept="application/json,.json" hidden>
-        </label>
-      </div>
+        <div class="aside-row">
+          <details class="details">
+            <summary>Was macht das Lesezeichen genau?</summary>
+            <p>Es liest auf bahn.de – mit deiner bestehenden Anmeldung – deine BahnCard und deine vergangenen Buchungen über dieselben Schnittstellen, die auch „Meine Reisen“ nutzt. Daraus behält es nur Datum, Strecke, Tarif, Preis, BahnCard-Ersparnis und Zugabschnitte. Namen, Adressen, E-Mail und Zahlungsdaten werden nicht übernommen.</p>
+            <p><a href="collector.js" target="_blank" rel="noopener">Quelltext ansehen</a></p>
+          </details>
+          <div class="upload">
+            <span class="small muted">Fenster wurde blockiert? Dann hat das Lesezeichen eine Datei gespeichert.</span>
+            <label class="btn btn--ghost btn--small">
+              Datei laden
+              <input type="file" id="file-input" accept="application/json,.json" hidden>
+            </label>
+          </div>
+        </div>
+      </section>
     </section>
 
     <!-- Import -->
     <section id="view-import" class="hidden">
-      <div class="card hero">
-        <div class="hero__rule" aria-hidden="true"></div>
-        <h1 class="hero__title" id="import-title">Hole deine Fahrten von bahn.de …</h1>
+      <div class="wrap importing">
+        <div class="bc bc--loading" aria-hidden="true">
+          <div class="bc__fill"></div>
+          <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">BahnCard-Bilanz</span></div>
+          <div class="bc__amount">…</div>
+        </div>
+        <h1 class="h2" id="import-title">Hole deine Fahrten von bahn.de …</h1>
         <p class="muted" id="import-text">Warte auf das Lesezeichen …</p>
         <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="import-bar"><span></span></div>
-        <p class="muted small">Lass das bahn.de-Fenster offen, bis die Auswertung erscheint.</p>
+        <p class="small muted">Lass den bahn.de-Tab offen, bis die Auswertung erscheint.</p>
       </div>
     </section>
 
     <!-- Ergebnis -->
     <section id="view-result" class="hidden" aria-live="polite"></section>
 
-    <div class="card" id="datenschutz">
-      <h2>Datenschutz</h2>
-      <ul class="list">
-        <li><strong>Kein Server, kein Konto, kein Tracking.</strong> Die Seite ist rein statisch, die Auswertung passiert komplett in deinem Browser.</li>
-        <li>Deine Daten liegen nur im Speicher dieses Tabs und verschwinden, wenn du ihn schließt oder auf „Neu starten“ klickst.</li>
-        <li>Das Lesezeichen nutzt deine bestehende bahn.de-Anmeldung, liest nur und ändert nichts an deinen Buchungen.</li>
-      </ul>
-      <p class="small"><a href="datenschutz.html">Vollständige Datenschutzerklärung (auch für die Browser-Erweiterung)</a></p>
-    </div>
+    <div class="wrap section info">
+      <section id="faq">
+        <p class="eyebrow">Fragen</p>
+        <h2 class="h2">FAQ</h2>
+        <details class="details"><summary>Wie wird die Ersparnis berechnet?</summary>
+          <p>Für jede Fahrt weist bahn.de selbst aus, wie viel die BahnCard gespart hat („Ersparnis durch BahnCard-Rabatt“). Diese Beträge werden für alle Fahrten im Gültigkeitszeitraum deiner BahnCard addiert und dem Kartenpreis gegenübergestellt.</p></details>
+        <details class="details"><summary>Woher kommt der Preis meiner BahnCard?</summary>
+          <p>bahn.de liefert den Kaufpreis nicht mit. Wir setzen den aktuellen Listenpreis für dein Kartenprodukt ein (z. B. My BahnCard 25: 39,90 €). Du kannst ihn in der Auswertung anpassen.</p></details>
+        <details class="details"><summary>Wie genau ist der Vergleich mit BahnCard 50 und 100?</summary>
+          <p>Es ist eine Schätzung mit deinen Fahrten: BahnCard 50 gibt 50 % auf Flex- und Normalpreise und 25 % auf Sparpreise, BahnCard 100 deckt alle DB-Tickets ab. Verbund-Einzeltickets (z. B. Stadtverkehr) werden unverändert übernommen. Ob du mit einer anderen Karte anders gebucht hättest, kann niemand wissen.</p></details>
+        <details class="details"><summary>Warum zählen Young-Tickets nicht?</summary>
+          <p>Sparpreis Young und Super Sparpreis Young sind bereits ermäßigt; die BahnCard wird darauf nicht zusätzlich angerechnet.</p></details>
+        <details class="details"><summary>Kilometer sind „ungefähr“ – warum?</summary>
+          <p>Wir summieren die Luftlinie von Halt zu Halt. Das liegt meist nah an der echten Strecke, ist aber keine Tarif-Entfernung.</p></details>
+      </section>
 
-    <div class="card" id="faq">
-      <h2>FAQ</h2>
-      <details class="details"><summary>Wie wird die Ersparnis berechnet?</summary>
-        <p>Für jede Fahrt weist bahn.de selbst aus, wie viel die BahnCard gespart hat („Ersparnis durch BahnCard-Rabatt“). Diese Beträge werden für alle Fahrten im Gültigkeitszeitraum deiner BahnCard addiert und dem Kartenpreis gegenübergestellt.</p></details>
-      <details class="details"><summary>Woher kommt der Preis meiner BahnCard?</summary>
-        <p>bahn.de liefert den Kaufpreis nicht mit. Wir setzen den aktuellen Listenpreis für dein Kartenprodukt ein (z. B. My BahnCard 25: 39,90 €). Du kannst ihn in der Auswertung anpassen.</p></details>
-      <details class="details"><summary>Wie genau ist der Vergleich mit BahnCard 50 und 100?</summary>
-        <p>Es ist eine Schätzung mit deinen Fahrten: BahnCard 50 gibt 50 % auf Flex- und Normalpreise und 25 % auf Sparpreise, BahnCard 100 deckt alle DB-Tickets ab. Verbund-Einzeltickets (z. B. Stadtverkehr) werden unverändert übernommen. Ob du mit einer anderen Karte anders gebucht hättest, kann niemand wissen.</p></details>
-      <details class="details"><summary>Warum zählen Young-Tickets nicht?</summary>
-        <p>Sparpreis Young und Super Sparpreis Young sind bereits ermäßigt; die BahnCard wird darauf nicht zusätzlich angerechnet.</p></details>
-      <details class="details"><summary>Kilometer sind „ungefähr“ – warum?</summary>
-        <p>Wir summieren die Luftlinie von Halt zu Halt. Das liegt meist nah an der echten Strecke, ist aber keine Tarif-Entfernung.</p></details>
+      <section id="datenschutz">
+        <p class="eyebrow">Datenschutz</p>
+        <h2 class="h2">Deine Daten bleiben bei dir</h2>
+        <ul class="checks">
+          <li><strong>Kein Server, kein Konto, kein Tracking.</strong> Die Seite ist rein statisch, die Auswertung passiert komplett in deinem Browser.</li>
+          <li><strong>Nur in diesem Tab.</strong> Deine Daten verschwinden, wenn du ihn schließt oder auf „Neu starten“ klickst.</li>
+          <li><strong>Nur lesen.</strong> Lesezeichen und Erweiterung nutzen deine bestehende bahn.de-Anmeldung und ändern nichts an deinen Buchungen.</li>
+        </ul>
+        <p class="small"><a href="datenschutz.html">Vollständige Datenschutzerklärung</a></p>
+      </section>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="track" aria-hidden="true"></div>
     <div class="wrap footer__inner">
       <p>BahnCard-Bilanz ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“, „DB“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.</p>
-      <p>Alle Angaben ohne Gewähr. Preise der BahnCards: Listenpreise laut bahn.de, Stand Oktober 2026. · <a href="datenschutz.html">Datenschutz</a></p>
+      <p>Alle Angaben ohne Gewähr. BahnCard-Preise: Listenpreise laut bahn.de, Stand Oktober 2026. · <a href="datenschutz.html">Datenschutz</a> · <a href="https://github.com/xsebo99/BC_Value_Check" target="_blank" rel="noopener">Quellcode</a></p>
     </div>
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

@@ -109,7 +109,8 @@ function setupErweiterung() {
     if (e.source !== window || !e.data || e.data.quelle !== 'bc-erweiterung') return;
     if (e.data.type === 'bc-ext-hallo') {
       $('#ext-card').classList.remove('hidden');
-      $('#so-gehts h2').textContent = 'Ohne Erweiterung: in 3 Schritten';
+      document.body.classList.add('has-ext');
+      $('#so-gehts h2').textContent = 'Ohne Erweiterung: in drei Schritten';
     } else {
       importNachricht(e.data);
     }
@@ -300,95 +301,121 @@ function render() {
 
   const cardOptions = d.bahncards.map((c, i) => `<option value="${i}" ${i === state.cardIdx ? 'selected' : ''}>${esc(kartenName(c))} · ${datum(c.ab)}–${datum(c.bis)}</option>`).join('');
 
-  let html = '';
+  let html = '<div class="wrap result">';
 
-  // Kopf: Karte & Preis
-  html += `<div class="card"><div class="cardpick">
-    ${d.bahncards.length ? `<label class="field">Deine BahnCard<select id="sel-card">${cardOptions}</select></label>` : '<p class="muted" style="margin:0">Keine BahnCard im Konto gefunden – wir rechnen mit den letzten 12 Monaten.</p>'}
-    ${card ? `<label class="field">Kartenpreis (€)<input id="inp-preis" type="number" min="0" step="0.01" value="${meinPreis.toFixed(2)}"></label>` : ''}
-  </div>
-  ${card && card.klasse === 'KLASSE_1' ? '<p class="muted small" style="margin:10px 0 0">1.-Klasse-Karte: Bitte prüfe den Kartenpreis – voreingestellt ist der Preis der 2. Klasse.</p>' : ''}
-  ${card && card.ermaessigt ? '<p class="muted small" style="margin:10px 0 0">Ermäßigte Karte: Bitte trage deinen tatsächlichen Kartenpreis ein.</p>' : ''}
+  // Karte & Preis – ruhige Werkzeugleiste
+  html += `<div class="toolbar">
+    ${d.bahncards.length ? `<label class="field">Deine BahnCard<select id="sel-card">${cardOptions}</select></label>` : '<p class="toolbar__note">Keine BahnCard im Konto gefunden – wir rechnen mit den letzten 12 Monaten.</p>'}
+    ${card ? `<label class="field">Kartenpreis in €<input id="inp-preis" type="number" min="0" step="0.01" value="${meinPreis.toFixed(2)}"></label>` : ''}
+    ${card && card.klasse === 'KLASSE_1' ? '<p class="toolbar__note">1.-Klasse-Karte: Bitte prüfe den Kartenpreis – voreingestellt ist der Preis der 2. Klasse.</p>' : ''}
+    ${card && card.ermaessigt ? '<p class="toolbar__note">Ermäßigte Karte: Bitte trage deinen tatsächlichen Kartenpreis ein.</p>' : ''}
   </div>`;
 
-  // Urteil
+  // Urteil: die Karte füllt sich mit der Ersparnis bis zum Kartenpreis
   if (card) {
-    const anteil = meinPreis > 0 ? Math.min(ersparnis / meinPreis, 2) : 1;
-    html += `<div class="card verdict ${plus ? 'verdict--plus' : 'verdict--minus'}">
-      <div class="verdict__kicker">${esc(kartenName(card))} · ${datum(von)} – ${datum(bis)}</div>
-      <div class="verdict__title">${plus ? 'Ja, sie hat sich gelohnt!' : laeuft ? 'Noch nicht drin.' : 'Nein, leider nicht.'}</div>
-      <div class="verdict__big num">${plus ? '+' : '−'}${eur(Math.abs(netto))}</div>
-      <div class="verdict__sub">${eur(ersparnis)} gespart · ${eur(meinPreis)} bezahlt</div>
-      <div class="meter" aria-hidden="true"><div class="meter__fill" style="width:${(anteil / 2) * 100}%"></div><div class="meter__mark" style="left:50%"></div></div>
-      <div class="meter__labels"><span>0 €</span><span>Kartenpreis ${eur0(meinPreis)}</span><span>${eur0(meinPreis * 2)}</span></div>
-      <p class="muted" style="margin:14px 0 0">${
-        breakEven ? `Seit dem <strong>${datum(breakEven.datum)}</strong> (${esc(kurzName(breakEven.von))} → ${esc(kurzName(breakEven.nach))}) bist du im Plus.`
-        : laeuft ? `Noch <strong>${eur(meinPreis - ersparnis)}</strong> bis zum Break-even – und ${restTage} Tage Zeit.` : 'Der Break-even wurde nicht erreicht.'
-      }${laeuft && plus ? ` Die Karte gilt noch ${restTage} Tage – jede weitere Fahrt ist Gewinn.` : ''}</p>
+    const anteil = meinPreis > 0 ? Math.min(ersparnis / meinPreis, 1) : 1;
+    const prozent = meinPreis > 0 ? Math.round((ersparnis / meinPreis) * 100) : 100;
+    html += `<div class="verdict ${plus ? 'verdict--plus' : 'verdict--minus'}">
+      <div class="bc ${plus ? '' : 'bc--minus'} ${anteil >= 1 ? 'bc--full' : ''}" data-fill="${anteil.toFixed(3)}" role="img"
+        aria-label="${esc(kartenName(card))}: ${prozent} Prozent des Kartenpreises gespart">
+        <div class="bc__fill"></div>
+        <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">${esc(kartenName(card))}</span></div>
+        <div class="bc__amount">${plus ? '+' : '−'}${eur(Math.abs(netto))}</div>
+        <div class="bc__bottom"><span>${datum(von)} – ${datum(bis)}</span><span class="bc__pct">${prozent} %</span></div>
+      </div>
+      <div>
+        <p class="eyebrow">Deine Bilanz</p>
+        <h1 class="verdict__title">${plus ? 'Ja, sie hat sich gelohnt.' : laeuft ? 'Noch nicht drin.' : 'Nein, leider nicht.'}</h1>
+        <dl class="verdict__facts">
+          <div><dt>Gespart</dt><dd>${eur(ersparnis)}</dd></div>
+          <div><dt>Kartenpreis</dt><dd>${eur(meinPreis)}</dd></div>
+        </dl>
+        <p class="verdict__text">${
+          breakEven ? `Seit dem <strong>${datum(breakEven.datum)}</strong> (${esc(kurzName(breakEven.von))} → ${esc(kurzName(breakEven.nach))}) bist du im Plus.`
+          : laeuft ? `Noch <strong>${eur(meinPreis - ersparnis)}</strong> bis zum Break-even – und ${restTage} Tage Zeit.` : 'Der Break-even wurde nicht erreicht.'
+        }${laeuft && plus ? ` Die Karte gilt noch ${restTage} Tage – jede weitere Fahrt ist Gewinn.` : ''}</p>
+      </div>
     </div>`;
   }
 
   // Hinweise
   const hinweise = [];
-  if (ohneBC.length) hinweise.push(`<div class="callout"><span class="callout__icon">💸</span><p><strong>${eur(verschenkt)} verschenkt:</strong> Bei ${ohneBC.length} ${ohneBC.length === 1 ? 'Fahrt' : 'Fahrten'} war keine BahnCard hinterlegt, obwohl der Tarif rabattfähig war (${ohneBC.map((x) => datum(x.datum, { day: '2-digit', month: '2-digit' })).join(', ')}). Tipp: BahnCard im Kundenkonto als Ermäßigung speichern.</p></div>`);
-  if (youngAnzahl) hinweise.push(`<div class="callout callout--good"><span class="callout__icon">🎒</span><p><strong>${youngAnzahl} Young-${youngAnzahl === 1 ? 'Ticket' : 'Tickets'}:</strong> Darauf wird die BahnCard nicht angerechnet. Ab 27 fallen Young-Preise weg – dann zählt die BahnCard bei diesen Fahrten wieder voll.</p></div>`);
-  if (card && best.id !== 'ohne' && mineId && best.id !== mineId) hinweise.push(`<div class="callout callout--good"><span class="callout__icon">🔁</span><p>Mit deinem Fahrprofil wäre die <strong>${best.name}</strong> günstiger gewesen (${eur(sz.find((s) => s.id === mineId).gesamt - best.gesamt)} weniger).</p></div>`);
-  if (hinweise.length) html += `<div class="card"><h2>Gut zu wissen</h2>${hinweise.join('')}</div>`;
+  if (ohneBC.length) hinweise.push(`<div class="note"><span class="note__icon" aria-hidden="true">💸</span><p><strong>${eur(verschenkt)} verschenkt.</strong> Bei ${ohneBC.length} ${ohneBC.length === 1 ? 'Fahrt' : 'Fahrten'} war keine BahnCard hinterlegt, obwohl der Tarif rabattfähig war (${ohneBC.map((x) => datum(x.datum, { day: '2-digit', month: '2-digit' })).join(', ')}). Tipp: BahnCard im Kundenkonto als Ermäßigung speichern.</p></div>`);
+  if (youngAnzahl) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🎒</span><p><strong>${youngAnzahl} Young-${youngAnzahl === 1 ? 'Ticket' : 'Tickets'}.</strong> Darauf wird die BahnCard nicht angerechnet. Ab 27 fallen Young-Preise weg – dann zählt die BahnCard bei diesen Fahrten wieder voll.</p></div>`);
+  if (card && best.id !== 'ohne' && mineId && best.id !== mineId) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🔁</span><p>Mit deinem Fahrprofil wäre die <strong>${best.name}</strong> günstiger gewesen (${eur(sz.find((s) => s.id === mineId).gesamt - best.gesamt)} weniger).</p></div>`);
+  if (hinweise.length) html += `<div class="notes">${hinweise.join('')}</div>`;
 
   // Kurve
-  if (card && kurve.length) html += `<div class="card"><h2>Wann hat sich die Karte bezahlt gemacht?</h2>
-    <p class="muted small">Kumulierte BahnCard-Ersparnis im Gültigkeitszeitraum.</p>
+  if (card && kurve.length) html += `<section class="block">
+    <p class="eyebrow">Verlauf</p>
+    <h2 class="h2">Wann hat sich die Karte bezahlt gemacht?</h2>
+    <p class="block__intro">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt. Wo die Linie den Kartenpreis kreuzt, war die Karte bezahlt.</p>
     ${chartKurve(kurve, von, bis, meinPreis, heute)}
-    <div class="legend"><span><i></i>Ersparnis (kumuliert)</span><span><i class="ref"></i>Kartenpreis</span></div></div>`;
+    <div class="legend"><span><i></i>Ersparnis, aufsummiert</span><span><i class="ref"></i>Kartenpreis</span></div>
+  </section>`;
 
   // Vergleich
-  html += `<div class="card"><h2>BahnCard 25, 50 oder 100?</h2>
-    <p class="muted small">Was dieselben ${liste.length} Fahrten mit jeder Karte gekostet hätten. Kartenpreise sind änderbar.</p>
-    <div class="tablewrap"><table>
-      <thead><tr><th>Variante</th><th class="r">Karte</th><th class="r">Tickets</th><th class="r">Gesamt</th></tr></thead>
-      <tbody>${sz.map((s) => `<tr class="${s.id === best.id ? 'best' : ''} ${s.id === mineId ? 'mine' : ''}">
-        <td>${s.name}</td>
-        <td class="r">${s.id === 'ohne' ? '–' : `<input class="cell-input" data-preis="${s.id}" type="number" min="0" step="0.01" value="${s.karte.toFixed(2)}" aria-label="Preis ${s.name}">`}</td>
-        <td class="r">${eur(s.tickets)}</td><td class="r">${eur(s.gesamt)}</td></tr>`).join('')}</tbody>
-    </table></div>
+  html += `<section class="block">
+    <p class="eyebrow">Vergleich</p>
+    <h2 class="h2">BahnCard 25, 50 oder 100?</h2>
+    <p class="block__intro">Was dieselben ${liste.length} Fahrten mit jeder Karte gekostet hätten. Die Kartenpreise kannst du anpassen.</p>
+    <div class="compare">${sz.map((s) => `<div class="option ${s.id === best.id ? 'option--best' : ''}">
+      <div class="option__badges">${s.id === best.id ? '<span class="badge badge--best">Am günstigsten</span>' : ''}${s.id === mineId ? '<span class="badge">Deine Karte</span>' : ''}</div>
+      <div class="option__name">${s.name}</div>
+      <div class="option__total">${eur(s.gesamt)}</div>
+      <div class="option__row"><span>Tickets</span><span>${eur(s.tickets)}</span></div>
+      <div class="option__row"><span>Karte</span>${s.id === 'ohne' ? '<span>–</span>' : `<input class="cell-input" data-preis="${s.id}" type="number" min="0" step="0.01" value="${s.karte.toFixed(2)}" aria-label="Kartenpreis ${s.name}">`}</div>
+    </div>`).join('')}</div>
     ${breakEvenText(liste, preise)}
-  </div>`;
+  </section>`;
 
-  // Statistiken
-  html += `<div class="card"><h2>Deine Bahn-Statistik</h2>
-    <p class="muted small">${card ? 'Im Gültigkeitszeitraum der Karte' : 'Letzte 12 Monate'} · ${datum(von)} – ${datum(bis)}</p>
-    <div class="tiles">
-      ${tile('Fahrten', int(liste.length), `${new Set(liste.map((x) => x.nr)).size} Buchungen`)}
-      ${tile('Ausgegeben', eur0(ausgegeben), liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : '')}
-      ${tile('Strecke', int(km) + ' km', km ? `≈ ${(km / 40075).toLocaleString('de-DE', { maximumFractionDigits: 2 })}× um die Erde` : 'keine Angaben')}
-      ${tile('Im Zug', int(stunden) + ' h', stunden ? `≈ ${(stunden / 24).toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage` : '')}
-      ${tile('Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: ca. 30–50 ct/km')}
-      ${tile('Teuerste Fahrt', teuerste ? eur(teuerste.preis) : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : '')}
-      ${tile('Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}×` : '', true)}
-      ${tile('Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}×` : '', true)}
-      ${tile('Meist genutzt', zuege.length ? zuege.map(([z, n]) => `${z} ${n}×`).join(' · ') : '–', 'Zugabschnitte', true)}
+  // Statistiken – sechs Kennzahlen, der Rest als Text
+  html += `<section class="block">
+    <p class="eyebrow">${card ? 'Im Gültigkeitszeitraum' : 'Letzte 12 Monate'} · ${datum(von)} – ${datum(bis)}</p>
+    <h2 class="h2">Dein Jahr auf der Schiene</h2>
+    <div class="stats">
+      ${stat('Fahrten', int(liste.length), `${new Set(liste.map((x) => x.nr)).size} Buchungen`)}
+      ${stat('Ausgegeben', eur0(ausgegeben), liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : '')}
+      ${stat('Strecke', int(km) + ' km', km ? `≈ ${(km / 40075).toLocaleString('de-DE', { maximumFractionDigits: 2 })}-mal um die Erde` : 'keine Angaben')}
+      ${stat('Im Zug', int(stunden) + ' h', stunden ? `≈ ${(stunden / 24).toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage` : '')}
+      ${stat('Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: etwa 30–50 ct/km')}
+      ${stat('Teuerste Fahrt', teuerste ? eur(teuerste.preis) : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : '')}
+      ${stat('Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}-mal gefahren` : '', true)}
+      ${stat('Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}-mal` : '', true)}
+      ${stat('Meistgenutzte Züge', zuege.length ? zuege.map(([z, n]) => `${z} ${n}×`).join(' · ') : '–', 'Zugabschnitte', true)}
     </div>
+  </section>`;
+
+  html += `<section class="block duo">
+    <div><h3 class="h3">Ausgaben pro Monat</h3>${chartMonate(liste, von, bis)}</div>
+    <div><h3 class="h3">Nach Tarif</h3>${tarifBars(liste)}</div>
+  </section>`;
+
+  // Tabelle – eingeklappt
+  html += `<details class="trips">
+    <summary><h2 class="h2">Alle ${liste.length} Fahrten</h2></summary>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Datum</th><th>Strecke</th><th class="hide-sm">Tarif</th><th class="r">Preis</th><th class="r">BahnCard</th></tr></thead>
+      <tbody>${liste.slice().reverse().map((x) => `<tr>
+        <td class="num">${datum(x.datum)}</td>
+        <td>${esc(kurzName(x.von))} → ${esc(kurzName(x.nach))}</td>
+        <td class="hide-sm">${esc(x.tarif)}${x.klasse === 1 ? ' · 1. Kl.' : ''}</td>
+        <td class="r">${eur(x.preis)}</td>
+        <td class="r">${x.ersparnis ? `<span class="tag tag--bc">−${eur(x.ersparnis)}</span>` : x.verschenkt ? '<span class="tag tag--miss">vergessen</span>' : x.art === 'young' ? '<span class="tag">Young</span>' : '<span class="tag">–</span>'}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="muted">Keine Fahrten in diesem Zeitraum.</td></tr>'}</tbody>
+    </table></div>
+  </details>
+  <p class="stand">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Demo-Daten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p>
   </div>`;
-
-  html += `<div class="card"><h2>Ausgaben pro Monat</h2>${chartMonate(liste, von, bis)}</div>`;
-  html += `<div class="card"><h2>Tarife</h2>${tarifBars(liste)}</div>`;
-
-  // Tabelle
-  html += `<div class="card"><h2>Alle Fahrten</h2><div class="tablewrap"><table>
-    <thead><tr><th>Datum</th><th>Strecke</th><th class="hide-sm">Tarif</th><th class="r">Preis</th><th class="r">BahnCard</th></tr></thead>
-    <tbody>${liste.slice().reverse().map((x) => `<tr>
-      <td class="num">${datum(x.datum)}</td>
-      <td>${esc(kurzName(x.von))} → ${esc(kurzName(x.nach))}</td>
-      <td class="hide-sm">${esc(x.tarif)}${x.klasse === 1 ? ' · 1. Kl.' : ''}</td>
-      <td class="r">${eur(x.preis)}</td>
-      <td class="r">${x.ersparnis ? `<span class="tag tag--bc">−${eur(x.ersparnis)}</span>` : x.verschenkt ? '<span class="tag tag--miss">vergessen</span>' : x.art === 'young' ? '<span class="tag">Young</span>' : '<span class="tag">–</span>'}</td>
-    </tr>`).join('') || '<tr><td colspan="5" class="muted">Keine Fahrten in diesem Zeitraum.</td></tr>'}</tbody>
-  </table></div>
-  <p class="muted small" style="margin-top:10px">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Demo-Daten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p></div>`;
 
   const root = $('#view-result');
+  const offen = root.querySelector('.trips[open]');
   root.innerHTML = html;
+  if (offen) root.querySelector('.trips').open = true;
   bind(root);
+  // Karte erst leer zeichnen, dann füllen – beim ersten Anzeigen sieht man sie volllaufen.
+  const bc = root.querySelector('.bc[data-fill]');
+  if (bc) requestAnimationFrame(() => requestAnimationFrame(() => bc.style.setProperty('--fill', bc.dataset.fill)));
 }
 
 function breakEvenText(liste, preise) {
@@ -396,11 +423,11 @@ function breakEvenText(liste, preise) {
   const diff = preise.bc50 - preise.bc25;
   if (diff <= 0) return '';
   const flexVoll = liste.filter((x) => x.art === 'flex').reduce((s, x) => s + x.voll, 0);
-  return `<p class="muted small" style="margin-top:12px">Faustregel: Die BahnCard 50 lohnt sich gegenüber der 25 erst ab etwa <strong>${eur0(diff / 0.25)}</strong> Flex-/Normalpreis-Tickets (Preis ohne Rabatt) im Jahr – bei Sparpreisen geben beide 25 %. Du hattest ${eur0(flexVoll)}.</p>`;
+  return `<p class="rule">Faustregel: Die BahnCard 50 lohnt sich gegenüber der 25 erst ab etwa <strong>${eur0(diff / 0.25)}</strong> Flex- und Normalpreis-Tickets (Preis ohne Rabatt) im Jahr – bei Sparpreisen geben beide 25 %. Du hattest ${eur0(flexVoll)}.</p>`;
 }
 
-function tile(label, value, note, text) {
-  return `<div class="tile"><div class="tile__label">${esc(label)}</div><div class="tile__value ${text ? 'tile__value--text' : ''}">${esc(value)}</div>${note ? `<div class="tile__note">${esc(note)}</div>` : ''}</div>`;
+function stat(label, value, note, text) {
+  return `<div class="stat"><div class="stat__label">${esc(label)}</div><div class="stat__value ${text ? 'stat__value--text' : ''}">${esc(value)}</div>${note ? `<div class="stat__note">${esc(note)}</div>` : ''}</div>`;
 }
 
 function kurzName(s) {
@@ -416,9 +443,9 @@ function tarifBars(liste) {
   }
   const rows = [...m.entries()].sort((a, b) => b[1].sum - a[1].sum);
   const max = Math.max(1, ...rows.map(([, v]) => v.sum));
-  return `<div class="hbars">${rows.map(([k, v]) => `<div class="hbar" data-tip="${esc(`${k}: ${v.n} Fahrten, ${eur(v.sum)}`)}">
-    <span>${esc(k)}</span><span class="hbar__track"><span class="hbar__fill" style="width:${(v.sum / max) * 100}%;display:block"></span></span>
-    <span class="hbar__val">${eur0(v.sum)} · ${v.n}×</span></div>`).join('') || '<p class="muted">Keine Daten.</p>'}</div>`;
+  return `<div class="hbars">${rows.map(([k, v]) => `<div class="hbar">
+    <div class="hbar__head"><span>${esc(k)}</span><span class="hbar__val">${eur0(v.sum)} · ${v.n}×</span></div>
+    <span class="hbar__track"><span class="hbar__fill" style="width:${(v.sum / max) * 100}%"></span></span></div>`).join('') || '<p class="muted">Keine Daten.</p>'}</div>`;
 }
 
 // --- SVG-Diagramme ---------------------------------------------------------
@@ -432,6 +459,8 @@ function niceMax(v) {
 }
 
 function chartKurve(kurve, von, bis, preis, heute) {
+  // Volle Seitenbreite – breiteres Koordinatensystem, damit die Schrift nicht mitwächst.
+  const W = 1040, H = 340;
   const ymax = niceMax(Math.max(preis * 1.15, kurve[kurve.length - 1].kum * 1.1));
   const x = (d) => PAD.l + ((d - von) / (bis - von)) * (W - PAD.l - PAD.r);
   const y = (v) => H - PAD.b - (v / ymax) * (H - PAD.t - PAD.b);
