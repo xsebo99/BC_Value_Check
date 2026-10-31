@@ -118,7 +118,7 @@ function setupErweiterung() {
   $('#btn-ext').addEventListener('click', () => {
     show('view-import');
     $('#import-title').textContent = 'Hole deine Fahrten von bahn.de …';
-    $('#import-text').textContent = 'Im neuen bahn.de-Tab anmelden (falls nötig) – danach geht es automatisch weiter.';
+    $('#import-text').textContent = 'Im bahn.de-Tab anmelden, dann geht es automatisch weiter.';
     $('#import-bar span').style.width = '3%';
     window.postMessage({ type: 'bc-ext-start' }, location.origin);
   });
@@ -340,7 +340,7 @@ function render() {
 
   // Hinweise
   const hinweise = [];
-  if (ohneBC.length) hinweise.push(`<div class="note"><span class="note__icon" aria-hidden="true">💸</span><p><strong>${eur(verschenkt)} verschenkt.</strong> Bei ${ohneBC.length} ${ohneBC.length === 1 ? 'Fahrt' : 'Fahrten'} war keine BahnCard hinterlegt, obwohl der Tarif rabattfähig war (${ohneBC.map((x) => datum(x.datum, { day: '2-digit', month: '2-digit' })).join(', ')}). Tipp: BahnCard im Kundenkonto als Ermäßigung speichern.</p></div>`);
+  if (ohneBC.length) hinweise.push(`<div class="note"><span class="note__icon" aria-hidden="true">💸</span><p><strong>${eur(verschenkt)} verschenkt.</strong> Bei ${ohneBC.length} ${ohneBC.length === 1 ? 'Fahrt' : 'Fahrten'} war keine BahnCard hinterlegt, obwohl der Tarif rabattfähig war (${ohneBC.map((x) => datum(x.datum, { day: '2-digit', month: '2-digit' })).join(', ')}). Tipp: BahnCard im Kundenkonto hinterlegen.</p></div>`);
   if (youngAnzahl) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🎒</span><p><strong>${youngAnzahl} Young-${youngAnzahl === 1 ? 'Ticket' : 'Tickets'}.</strong> Darauf wird die BahnCard nicht angerechnet. Ab 27 fallen Young-Preise weg – dann zählt die BahnCard bei diesen Fahrten wieder voll.</p></div>`);
   if (card && best.id !== 'ohne' && mineId && best.id !== mineId) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🔁</span><p>Mit deinem Fahrprofil wäre die <strong>${best.name}</strong> günstiger gewesen (${eur(sz.find((s) => s.id === mineId).gesamt - best.gesamt)} weniger).</p></div>`);
   if (hinweise.length) html += `<div class="notes">${hinweise.join('')}</div>`;
@@ -349,7 +349,7 @@ function render() {
   // Kurve
   if (card && kurve.length) html += `<section class="panel block">
     <h2 class="h2">Wann hat sich die Karte bezahlt gemacht?</h2>
-    <p class="meta">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt. Wo die Linie den Kartenpreis kreuzt, war die Karte bezahlt.</p>
+    <p class="meta">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt.</p>
     ${chartKurve(kurve, von, bis, meinPreis, heute)}
     <div class="legend"><span><i></i>Ersparnis, aufsummiert</span><span><i class="ref"></i>Kartenpreis</span></div>
   </section>`;
@@ -357,7 +357,7 @@ function render() {
   // Vergleich: jede Variante als Mini-BahnCard – „ohne“ ist eine leere, gestrichelte Karte, die günstigste ist grün
   html += `<section class="panel block">
     <h2 class="h2">BahnCard 25, 50 oder 100?</h2>
-    <p class="meta">Dieselben ${liste.length} Fahrten, mit jeder Karte gerechnet. Die Kartenpreise kannst du anpassen.</p>
+    <p class="meta">Deine ${liste.length} Fahrten, mit jeder Karte gerechnet.</p>
     <div class="compare">${sz.map((s) => `<div class="option">
       <div class="minicard ${s.id === 'ohne' ? 'minicard--ohne' : ''} ${s.id === best.id ? 'minicard--best' : ''}">
         <div class="minicard__name"><span>${s.name}</span><span class="minicard__tag">${s.id === best.id ? 'günstigste' : s.id === mineId ? 'deine' : ''}</span></div>
@@ -389,7 +389,6 @@ function render() {
           <span><strong>${int(liste.length)}</strong> Fahrten</span>
           <span><strong>${int(stunden)} h</strong> im Zug</span>
           <span><strong>${int(new Set(liste.map((x) => x.nr)).size)}</strong> Buchungen</span>
-          ${km ? `<span>≈ ${(km / 40075).toLocaleString('de-DE', { maximumFractionDigits: 2 })}-mal um die Erde</span>` : ''}
         </div>
       </div>
       <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
@@ -434,7 +433,7 @@ function breakEvenText(liste, preise) {
   const diff = preise.bc50 - preise.bc25;
   if (diff <= 0) return '';
   const flexVoll = liste.filter((x) => x.art === 'flex').reduce((s, x) => s + x.voll, 0);
-  return `<p class="rule">Faustregel: Die BahnCard 50 lohnt sich gegenüber der 25 erst ab etwa <strong>${eur0(diff / 0.25)}</strong> Flex- und Normalpreis-Tickets (Preis ohne Rabatt) im Jahr – bei Sparpreisen geben beide 25 %. Du hattest ${eur0(flexVoll)}.</p>`;
+  return `<p class="rule">Die BahnCard 50 lohnt sich gegenüber der 25 erst ab ca. <strong>${eur0(diff / 0.25)}</strong> Flexpreis-Tickets (ohne Rabatt) im Jahr. Du hattest ${eur0(flexVoll)}.</p>`;
 }
 
 function kurzName(s) {
