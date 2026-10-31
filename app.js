@@ -304,7 +304,7 @@ function render() {
   let html = '<div class="wrap result">';
 
   // Karte & Preis – ruhige Werkzeugleiste
-  html += `<div class="toolbar">
+  html += `<div class="panel panel--lead"><div class="toolbar">
     ${d.bahncards.length ? `<label class="field">Deine BahnCard<select id="sel-card">${cardOptions}</select></label>` : '<p class="toolbar__note">Keine BahnCard im Konto gefunden – wir rechnen mit den letzten 12 Monaten.</p>'}
     ${card ? `<label class="field">Kartenpreis in €<input id="inp-preis" type="number" min="0" step="0.01" value="${meinPreis.toFixed(2)}"></label>` : ''}
     ${card && card.klasse === 'KLASSE_1' ? '<p class="toolbar__note">1.-Klasse-Karte: Bitte prüfe den Kartenpreis – voreingestellt ist der Preis der 2. Klasse.</p>' : ''}
@@ -344,9 +344,10 @@ function render() {
   if (youngAnzahl) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🎒</span><p><strong>${youngAnzahl} Young-${youngAnzahl === 1 ? 'Ticket' : 'Tickets'}.</strong> Darauf wird die BahnCard nicht angerechnet. Ab 27 fallen Young-Preise weg – dann zählt die BahnCard bei diesen Fahrten wieder voll.</p></div>`);
   if (card && best.id !== 'ohne' && mineId && best.id !== mineId) hinweise.push(`<div class="note note--good"><span class="note__icon" aria-hidden="true">🔁</span><p>Mit deinem Fahrprofil wäre die <strong>${best.name}</strong> günstiger gewesen (${eur(sz.find((s) => s.id === mineId).gesamt - best.gesamt)} weniger).</p></div>`);
   if (hinweise.length) html += `<div class="notes">${hinweise.join('')}</div>`;
+  html += `</div>`;
 
   // Kurve
-  if (card && kurve.length) html += `<section class="block">
+  if (card && kurve.length) html += `<section class="panel block">
     <p class="eyebrow">Verlauf</p>
     <h2 class="h2">Wann hat sich die Karte bezahlt gemacht?</h2>
     <p class="block__intro">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt. Wo die Linie den Kartenpreis kreuzt, war die Karte bezahlt.</p>
@@ -355,7 +356,7 @@ function render() {
   </section>`;
 
   // Vergleich
-  html += `<section class="block">
+  html += `<section class="panel block">
     <p class="eyebrow">Vergleich</p>
     <h2 class="h2">BahnCard 25, 50 oder 100?</h2>
     <p class="block__intro">Was dieselben ${liste.length} Fahrten mit jeder Karte gekostet hätten. Die Kartenpreise kannst du anpassen.</p>
@@ -370,7 +371,7 @@ function render() {
   </section>`;
 
   // Statistiken – sechs Kennzahlen, der Rest als Text
-  html += `<section class="block">
+  html += `<section class="panel block">
     <p class="eyebrow">${card ? 'Im Gültigkeitszeitraum' : 'Letzte 12 Monate'} · ${datum(von)} – ${datum(bis)}</p>
     <h2 class="h2">Dein Jahr auf der Schiene</h2>
     <div class="stats">
@@ -386,13 +387,13 @@ function render() {
     </div>
   </section>`;
 
-  html += `<section class="block duo">
-    <div><h3 class="h3">Ausgaben pro Monat</h3>${chartMonate(liste, von, bis)}</div>
-    <div><h3 class="h3">Nach Tarif</h3>${tarifBars(liste)}</div>
+  html += `<section class="duo">
+    <div class="panel"><h3 class="h3">Ausgaben pro Monat</h3>${chartMonate(liste, von, bis)}</div>
+    <div class="panel"><h3 class="h3">Nach Tarif</h3>${tarifBars(liste)}</div>
   </section>`;
 
   // Tabelle – eingeklappt
-  html += `<details class="trips">
+  html += `<details class="panel trips">
     <summary><h2 class="h2">Alle ${liste.length} Fahrten</h2></summary>
     <div class="tablewrap"><table>
       <thead><tr><th>Datum</th><th>Strecke</th><th class="hide-sm">Tarif</th><th class="r">Preis</th><th class="r">BahnCard</th></tr></thead>

@@ -7,7 +7,7 @@
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
   <link rel="icon" href="extension/icons/icon32.png">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <header class="top">
@@ -53,7 +53,8 @@
         </div>
       </div>
 
-      <section class="wrap section" id="so-gehts">
+      <div class="wrap section">
+      <section class="panel" id="so-gehts">
         <p class="eyebrow">Ohne Installation</p>
         <h2 class="h2">Ohne Erweiterung: in drei Schritten</h2>
         <ol class="steps">
@@ -91,11 +92,12 @@
           </div>
         </div>
       </section>
+      </div>
     </section>
 
     <!-- Import -->
     <section id="view-import" class="hidden">
-      <div class="wrap importing">
+      <div class="wrap"><div class="panel importing">
         <div class="bc bc--loading" aria-hidden="true">
           <div class="bc__fill"></div>
           <div class="bc__top"><span class="bc__logo">%</span><span class="bc__type">BahnCard-Bilanz</span></div>
@@ -105,14 +107,14 @@
         <p class="muted" id="import-text">Warte auf das Lesezeichen …</p>
         <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="import-bar"><span></span></div>
         <p class="small muted">Lass den bahn.de-Tab offen, bis die Auswertung erscheint.</p>
-      </div>
+      </div></div>
     </section>
 
     <!-- Ergebnis -->
     <section id="view-result" class="hidden" aria-live="polite"></section>
 
-    <div class="wrap section info">
-      <section id="faq">
+    <div class="wrap info">
+      <section class="panel" id="faq">
         <p class="eyebrow">Fragen</p>
         <h2 class="h2">FAQ</h2>
         <details class="details"><summary>Wie wird die Ersparnis berechnet?</summary>
@@ -127,7 +129,7 @@
           <p>Wir summieren die Luftlinie von Halt zu Halt. Das liegt meist nah an der echten Strecke, ist aber keine Tarif-Entfernung.</p></details>
       </section>
 
-      <section id="datenschutz">
+      <section class="panel" id="datenschutz">
         <p class="eyebrow">Datenschutz</p>
         <h2 class="h2">Deine Daten bleiben bei dir</h2>
         <ul class="checks">
@@ -148,6 +150,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
