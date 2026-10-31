@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SparSchiene – hat sich deine BahnCard gelohnt?</title>
+  <title>SparSchiene – hat sich meine BahnCard gelohnt?</title>
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
   <link rel="icon" href="extension/icons/icon32.png" sizes="32x32">
   <link rel="icon" href="extension/icons/icon16.png" sizes="16x16">
   <link rel="apple-touch-icon" href="extension/icons/icon128.png">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=18">
-  <script src="theme.js?v=18"></script>
+  <link rel="stylesheet" href="styles.css?v=21">
+  <script src="theme.js?v=20"></script>
 </head>
 <body>
   <header class="top">
@@ -37,8 +37,13 @@
     <section id="view-start">
       <div class="wrap hero">
         <div class="hero__text">
-          <h1 class="display" aria-label="Hat sich deine BahnCard gelohnt?">Hat sich deine <span class="nowrap"><span class="display__marke">BahnCard</span><span class="flap flap--titel" id="wechsel" aria-hidden="true"><span class="flap__z">&nbsp;</span><span class="flap__z">2</span><span class="flap__z">5</span></span></span> gelohnt?</h1>
+          <h1 class="display" aria-label="Hat sich meine BahnCard gelohnt?">Hat sich meine <span class="nowrap"><span class="display__marke">BahnCard</span><span class="flap flap--titel" id="wechsel" aria-hidden="true"><span class="flap__z">&nbsp;</span><span class="flap__z">2</span><span class="flap__z">5</span></span></span> gelohnt?</h1>
           <p class="lead">Mit deinen echten Fahrten von bahn.de: Ersparnis, Break-even und welche Karte besser gepasst hätte.</p>
+
+          <p class="geraet-hinweis">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 19h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span><strong>Nur am PC oder Laptop.</strong> Am Handy funktioniert es nicht.</span>
+          </p>
 
           <div class="hero__actions">
             <button class="btn btn--big ext-only" id="btn-ext" type="button">Meine Fahrten von bahn.de holen</button>
@@ -46,7 +51,6 @@
             <button class="btn btn--ghost btn--big" id="btn-demo" type="button">Demo ansehen</button>
           </div>
           <p class="hero__trust small muted hidden" id="ext-card">Öffnet bahn.de. Anmelden, den Rest erledigt die Erweiterung.</p>
-          <p class="hero__trust small muted">Funktioniert nur am PC oder Laptop, nicht am Handy.</p>
         </div>
 
         <div class="hero__card" aria-hidden="true">
@@ -163,6 +167,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>

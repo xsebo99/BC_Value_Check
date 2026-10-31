@@ -121,7 +121,8 @@ const FLAP_ZEICHEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const FLAP_TAKT = 130;      // ms pro Blatt
 const HERO_WECHSEL = 2940; // ms zwischen 25 → 50 → 100
 
-// Blättert jede Zelle über ein paar Zufallszeichen zum Zielzeichen, leicht versetzt wie an der Tafel
+// Blättert jede Zelle über ein paar Zufallszeichen zum Zielzeichen, leicht versetzt wie an der Tafel.
+// Auch Zellen, deren Zeichen gleich bleibt, blättern einmal durch – so läuft die ganze Anzeige.
 function flapZu(el, text, rechts = false) {
   const zellen = [...el.children];
   const zeichen = [...text];
@@ -130,7 +131,6 @@ function flapZu(el, text, rechts = false) {
   zellen.forEach((zelle, i) => {
     const soll = ziel[i] === ' ' ? ' ' : ziel[i];
     clearInterval(zelle._flap);
-    if (zelle.textContent === soll) return;
     if (RUHIG.matches) { zelle.textContent = soll; return; }
     let schritte = Math.round((3 + i % 4 + Math.floor(Math.random() * 3)) * 1.5);
     zelle._flap = setInterval(() => {
