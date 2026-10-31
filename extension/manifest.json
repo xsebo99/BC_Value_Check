@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "BahnCard-Bilanz",
+  "version": "0.1.0",
+  "description": "Holt deine Fahrten von bahn.de für die BahnCard-Bilanz – mit einem Klick. Liest nur, nichts verlässt deinen Browser.",
+  "background": { "service_worker": "background.js" },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.bahn.de/*"],
+      "js": ["core.js", "bahn.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://xsebo99.github.io/BC_Value_Check/*", "http://localhost:8765/*", "http://127.0.0.1:8765/*"],
+      "js": ["site.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
