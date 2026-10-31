@@ -206,9 +206,6 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 /* Schritte */
 .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
 .steps li { border-top: 2px solid var(--tinte); padding-top: 20px; }
-/* Anleitung je Gerät */
-body:not(.is-mobil) .nur-mobil, .is-mobil .nur-desktop,
-body:not(.is-ios) .nur-ios, .is-ios .nur-android { display: none !important; }
 .steps__n { display: block; font: 800 2.4rem/1 var(--font-display); font-stretch: 72%; color: var(--verkehrsrot); margin-bottom: 14px; }
 .steps h3 { font: 700 var(--t-h3)/1.25 var(--font-text); margin-bottom: 8px; }
 .steps p { margin-bottom: 12px; }
