@@ -128,10 +128,7 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--schotter) 86%, transparent); backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid transparent; }
 .top__inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--tinte); text-decoration: none; }
-.brand__logo {
-  width: 34px; height: 24px; border-radius: 6px; background: var(--verkehrsrot); color: #fff;
-  display: grid; place-items: center; font: 800 15px/1 var(--font-display);
-}
+.brand__logo { width: 32px; height: 32px; display: block; }
 .brand__name { font: 750 1.05rem/1 var(--font-display); font-stretch: 85%; letter-spacing: -.01em; }
 .top__nav { display: flex; align-items: center; gap: 24px; }
 .top__nav a { color: var(--tinte-2); text-decoration: none; font-size: .92rem; }

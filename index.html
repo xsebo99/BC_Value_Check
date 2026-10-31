@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SparSchiene – hat sich deine BahnCard gelohnt?</title>
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
-  <link rel="icon" href="extension/icons/icon32.png">
+  <link rel="icon" href="extension/icons/icon32.png" sizes="32x32">
+  <link rel="icon" href="extension/icons/icon16.png" sizes="16x16">
+  <link rel="apple-touch-icon" href="extension/icons/icon128.png">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
   <header class="top">
     <div class="wrap top__inner">
       <a class="brand" href="./" aria-label="SparSchiene – Startseite">
-        <span class="brand__logo" aria-hidden="true">%</span>
+        <img class="brand__logo" src="extension/icons/icon32.png" srcset="extension/icons/icon128.png 4x, extension/icons/icon48.png 1.5x" width="32" height="32" alt="">
         <span class="brand__name">SparSchiene</span>
       </a>
       <nav class="top__nav" aria-label="Seitennavigation">
@@ -145,6 +147,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
