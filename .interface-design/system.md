@@ -17,9 +17,7 @@ Quelle der Wahrheit für Werte ist `styles.css` (`:root` und der Dark-Mode-Block
 | `--tinte` (+ `-2..-4`) | Text und **bezahlte Beträge**: Balken, Tarif-Bars, Fortschritt | – |
 | `--bahncard` | die dunkle Karte als Objekt | Flächen/Panels |
 
-Einzige Ausnahme: Die wechselnde Kartennummer (25/50/100) im Hero-Titel ist rot, als Echo des Logos. Sie steht auf Fallblättern (`.flap`).
-
-Auf dunklen Fallblättern (`.tafel`, Titel) gelten in beiden Modi die Leuchttöne `--tafel-gruen` / `--tafel-rot`, das sind dieselben Töne wie Grün und Rot im Dark Mode.
+Einzige Ausnahme: „BahnCard“ und die wechselnde Kartennummer (25/50/100) im Hero-Titel sind rot, als Echo des Logos. Die Nummer steht auf Fallblättern (`.flap`), dort gilt in beiden Modi der Leuchtton `--tafel-rot`.
 
 Weitere Farben gibt es nicht. Wenn etwas eine neue Farbe zu brauchen scheint, wird es stattdessen über Gewicht oder Größe gelöst.
 
@@ -40,7 +38,7 @@ Weitere Farben gibt es nicht. Wenn etwas eine neue Farbe zu brauchen scheint, wi
 ## Signatur-Elemente
 
 - **BahnCard, die sich füllt** (`.bc`, `data-fill`): Die Ersparnis füllt die Karte bis zum Kartenpreis.
-- **Hero** (`.bc--hero` + `.tafel`): Fallblatt-Titel, Musterkarte (Chip, Nummer, Glanz, kippt mit der Maus) und Abfahrtstafel wechseln gemeinsam 25 → 50 → 100, mit Beispielwerten aus `HERO_BEISPIELE` in `app.js`. Bei `prefers-reduced-motion` wird nicht geblättert und nicht gekippt.
+- **Hero** (`.bc--hero`): Fallblatt-Titel und Musterkarte (Chip, Nummer, Glanz, kippt mit der Maus) wechseln gemeinsam 25 → 50 → 100, mit Beispielwerten aus `HERO_BEISPIELE` in `app.js`. Bei `prefers-reduced-motion` wird nicht geblättert und nicht gekippt.
 - **Mini-BahnCards** im Vergleich (`.minicard`):
   - „Ohne BahnCard“ ist eine leere, gestrichelte Karte (`--ohne`).
   - Die günstigste ist grün (`--best`).

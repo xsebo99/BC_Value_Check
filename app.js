@@ -109,12 +109,12 @@ function startImport() {
 // ---------------------------------------------------------------------------
 // Browser-Erweiterung (optional): meldet sich per postMessage aus ihrem Content-Script auf dieser Seite.
 // ---------------------------------------------------------------------------
-// Hero: Fallblatt-Titel, Musterkarte und Abfahrtstafel wechseln gemeinsam 25 → 50 → 100.
+// Hero: Fallblatt-Titel und Musterkarte wechseln gemeinsam 25 → 50 → 100.
 // Beispielwerte einer erfundenen Person, damit jede Variante ein anderes Ergebnis zeigt.
 const HERO_BEISPIELE = [
-  { nr: '25', karte: 'BC 25', typ: 'BahnCard 25', gespart: 41, preis: 62.90, bilanz: 'NOCH NICHT', ton: '' },
-  { nr: '50', karte: 'BC 50', typ: 'BahnCard 50', gespart: 312, preis: 244, bilanz: 'LOHNT SICH', ton: 'plus' },
-  { nr: '100', karte: 'BC100', typ: 'BahnCard 100', gespart: 3910, preis: 4899, bilanz: 'LOHNT NICHT', ton: 'minus' },
+  { nr: '25', typ: 'BahnCard 25', gespart: 41, preis: 62.90 },
+  { nr: '50', typ: 'BahnCard 50', gespart: 312, preis: 244 },
+  { nr: '100', typ: 'BahnCard 100', gespart: 3910, preis: 4899 },
 ];
 const RUHIG = matchMedia('(prefers-reduced-motion: reduce)');
 const FLAP_ZEICHEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -142,18 +142,11 @@ function flapZu(el, text, rechts = false) {
 function setupHero() {
   const bc = $('#hero-bc');
   if (!bc) return;
-  const tafelBilanz = $('#tafel-bilanz');
-  const tafelSaldo = $('#tafel-saldo');
 
   const zeige = (b) => {
     const saldo = b.gespart - b.preis;
     const saldoText = (saldo >= 0 ? '+' : '−') + int(Math.abs(saldo)) + ' €';
     flapZu($('#wechsel'), b.nr, true);
-    flapZu($('#tafel-karte'), b.karte);
-    tafelBilanz.dataset.ton = b.ton;
-    flapZu(tafelBilanz, b.bilanz);
-    tafelSaldo.dataset.ton = saldo >= 0 ? 'plus' : 'minus';
-    flapZu(tafelSaldo, saldoText, true);
     const fill = Math.min(1, b.gespart / b.preis);
     bc.style.setProperty('--fill', fill.toFixed(3));
     bc.classList.toggle('bc--full', fill >= 1);
