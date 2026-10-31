@@ -324,7 +324,7 @@ function render() {
         <div class="bc__bottom"><span>${datum(von)} – ${datum(bis)}</span><span class="bc__pct">${prozent} %</span></div>
       </div>
       <div>
-        <p class="eyebrow">Deine Bilanz</p>
+        <p class="verdict__kicker">Deine Bilanz</p>
         <h1 class="verdict__title">${plus ? 'Ja, sie hat sich gelohnt.' : laeuft ? 'Noch nicht drin.' : 'Nein, leider nicht.'}</h1>
         <dl class="verdict__facts">
           <div><dt>Gespart</dt><dd>${eur(ersparnis)}</dd></div>
@@ -348,47 +348,57 @@ function render() {
 
   // Kurve
   if (card && kurve.length) html += `<section class="panel block">
-    <p class="eyebrow">Verlauf</p>
     <h2 class="h2">Wann hat sich die Karte bezahlt gemacht?</h2>
-    <p class="block__intro">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt. Wo die Linie den Kartenpreis kreuzt, war die Karte bezahlt.</p>
+    <p class="meta">Jeder Punkt ist eine Fahrt mit BahnCard-Rabatt. Wo die Linie den Kartenpreis kreuzt, war die Karte bezahlt.</p>
     ${chartKurve(kurve, von, bis, meinPreis, heute)}
     <div class="legend"><span><i></i>Ersparnis, aufsummiert</span><span><i class="ref"></i>Kartenpreis</span></div>
   </section>`;
 
-  // Vergleich
+  // Vergleich: jede Variante als Mini-BahnCard – „ohne“ ist eine leere, gestrichelte Karte, die günstigste ist grün
   html += `<section class="panel block">
-    <p class="eyebrow">Vergleich</p>
     <h2 class="h2">BahnCard 25, 50 oder 100?</h2>
-    <p class="block__intro">Was dieselben ${liste.length} Fahrten mit jeder Karte gekostet hätten. Die Kartenpreise kannst du anpassen.</p>
-    <div class="compare">${sz.map((s) => `<div class="option ${s.id === best.id ? 'option--best' : ''}">
-      <div class="option__badges">${s.id === best.id ? '<span class="badge badge--best">Am günstigsten</span>' : ''}${s.id === mineId ? '<span class="badge">Deine Karte</span>' : ''}</div>
-      <div class="option__name">${s.name}</div>
-      <div class="option__total">${eur(s.gesamt)}</div>
+    <p class="meta">Dieselben ${liste.length} Fahrten, mit jeder Karte gerechnet. Die Kartenpreise kannst du anpassen.</p>
+    <div class="compare">${sz.map((s) => `<div class="option">
+      <div class="minicard ${s.id === 'ohne' ? 'minicard--ohne' : ''} ${s.id === best.id ? 'minicard--best' : ''}">
+        <div class="minicard__name"><span>${s.name}</span><span class="minicard__tag">${s.id === best.id ? 'günstigste' : s.id === mineId ? 'deine' : ''}</span></div>
+        <div class="minicard__total">${eur0(s.gesamt)}</div>
+      </div>
       <div class="option__row"><span>Tickets</span><span>${eur(s.tickets)}</span></div>
       <div class="option__row"><span>Karte</span>${s.id === 'ohne' ? '<span>–</span>' : `<input class="cell-input" data-preis="${s.id}" type="number" min="0" step="0.01" value="${s.karte.toFixed(2)}" aria-label="Kartenpreis ${s.name}">`}</div>
     </div>`).join('')}</div>
     ${breakEvenText(liste, preise)}
   </section>`;
 
-  // Statistiken – sechs Kennzahlen, der Rest als Text
+  // Statistik als Fahrtbeleg: die Strecke führt, der Rest steht wie auf einer Quittung
+  const posten = [
+    ['Ausgegeben', eur(ausgegeben), liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : ''],
+    ['Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: etwa 30–50 ct/km'],
+    ['Teuerste Fahrt', teuerste ? eur(teuerste.preis) : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : ''],
+    ['Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}-mal gefahren` : ''],
+    ['Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}-mal` : ''],
+    ['Meistgenutzte Züge', zuege.length ? zuege.map(([z, n]) => `${z} ${n}×`).join(' · ') : '–', ''],
+  ];
   html += `<section class="panel block">
-    <p class="eyebrow">${card ? 'Im Gültigkeitszeitraum' : 'Letzte 12 Monate'} · ${datum(von)} – ${datum(bis)}</p>
-    <h2 class="h2">Dein Jahr auf der Schiene</h2>
-    <div class="stats">
-      ${stat('Fahrten', int(liste.length), `${new Set(liste.map((x) => x.nr)).size} Buchungen`)}
-      ${stat('Ausgegeben', eur0(ausgegeben), liste.length ? `Ø ${eur(ausgegeben / liste.length)} pro Fahrt` : '')}
-      ${stat('Strecke', int(km) + ' km', km ? `≈ ${(km / 40075).toLocaleString('de-DE', { maximumFractionDigits: 2 })}-mal um die Erde` : 'keine Angaben')}
-      ${stat('Im Zug', int(stunden) + ' h', stunden ? `≈ ${(stunden / 24).toLocaleString('de-DE', { maximumFractionDigits: 1 })} Tage` : '')}
-      ${stat('Preis pro km', ctProKm ? ctProKm.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' ct' : '–', 'Auto: etwa 30–50 ct/km')}
-      ${stat('Teuerste Fahrt', teuerste ? eur(teuerste.preis) : '–', teuerste ? `${kurzName(teuerste.von)} → ${kurzName(teuerste.nach)}` : '')}
-      ${stat('Lieblingsstrecke', strecken[0] ? strecken[0][0] : '–', strecken[0] ? `${strecken[0][1]}-mal gefahren` : '', true)}
-      ${stat('Häufigstes Ziel', ziele[0] ? ziele[0][0] : '–', ziele[0] ? `${ziele[0][1]}-mal` : '', true)}
-      ${stat('Meistgenutzte Züge', zuege.length ? zuege.map(([z, n]) => `${z} ${n}×`).join(' · ') : '–', 'Zugabschnitte', true)}
+    <h2 class="h2">Dein Fahrtbeleg</h2>
+    <p class="meta">${card ? 'Im Gültigkeitszeitraum deiner Karte' : 'Letzte 12 Monate'}, ${datum(von)} – ${datum(bis)}</p>
+    <div class="beleg">
+      <div>
+        <div class="beleg__label">Mit der Bahn gefahren</div>
+        <div class="beleg__zahl">${int(km)} km</div>
+        <div class="beleg__sub">
+          <span><strong>${int(liste.length)}</strong> Fahrten</span>
+          <span><strong>${int(stunden)} h</strong> im Zug</span>
+          <span><strong>${int(new Set(liste.map((x) => x.nr)).size)}</strong> Buchungen</span>
+          ${km ? `<span>≈ ${(km / 40075).toLocaleString('de-DE', { maximumFractionDigits: 2 })}-mal um die Erde</span>` : ''}
+        </div>
+      </div>
+      <ul class="posten">${posten.map(([n, w, s]) => `<li><span class="posten__name">${esc(n)}</span><span class="posten__linie" aria-hidden="true"></span><span class="posten__wert">${esc(w)}${s ? `<small>${esc(s)}</small>` : ''}</span></li>`).join('')}</ul>
     </div>
   </section>`;
 
   html += `<section class="duo">
-    <div class="panel"><h3 class="h3">Ausgaben pro Monat</h3>${chartMonate(liste, von, bis)}</div>
+    <div class="panel"><h3 class="h3">Ausgaben pro Monat</h3>${chartMonate(liste, von, bis)}
+      <div class="legend"><span><i class="sw sw--bezahlt"></i>bezahlt</span><span><i class="sw"></i>durch BahnCard gespart</span></div></div>
     <div class="panel"><h3 class="h3">Nach Tarif</h3>${tarifBars(liste)}</div>
   </section>`;
 
@@ -425,10 +435,6 @@ function breakEvenText(liste, preise) {
   if (diff <= 0) return '';
   const flexVoll = liste.filter((x) => x.art === 'flex').reduce((s, x) => s + x.voll, 0);
   return `<p class="rule">Faustregel: Die BahnCard 50 lohnt sich gegenüber der 25 erst ab etwa <strong>${eur0(diff / 0.25)}</strong> Flex- und Normalpreis-Tickets (Preis ohne Rabatt) im Jahr – bei Sparpreisen geben beide 25 %. Du hattest ${eur0(flexVoll)}.</p>`;
-}
-
-function stat(label, value, note, text) {
-  return `<div class="stat"><div class="stat__label">${esc(label)}</div><div class="stat__value ${text ? 'stat__value--text' : ''}">${esc(value)}</div>${note ? `<div class="stat__note">${esc(note)}</div>` : ''}</div>`;
 }
 
 function kurzName(s) {
@@ -490,27 +496,35 @@ function chartKurve(kurve, von, bis, preis, heute) {
 function chartMonate(liste, von, bis) {
   const months = [];
   const m = new Date(von.getFullYear(), von.getMonth(), 1);
-  while (m <= bis) { months.push({ d: new Date(m), sum: 0, n: 0 }); m.setMonth(m.getMonth() + 1); }
+  while (m <= bis) { months.push({ d: new Date(m), sum: 0, gespart: 0, n: 0 }); m.setMonth(m.getMonth() + 1); }
   for (const x of liste) {
     const e = months.find((o) => o.d.getFullYear() === x.datum.getFullYear() && o.d.getMonth() === x.datum.getMonth());
-    if (e) { e.sum += x.preis + x.reservierung; e.n++; }
+    if (e) { e.sum += x.preis + x.reservierung; e.gespart += x.ersparnis; e.n++; }
   }
   if (!months.length) return '<p class="muted">Keine Daten.</p>';
-  const ymax = niceMax(Math.max(...months.map((o) => o.sum)));
+  // Ein Balken zeigt, was du bezahlt hast – oben drauf in Grün, was die BahnCard dabei gespart hat.
+  const ymax = niceMax(Math.max(...months.map((o) => o.sum + o.gespart)));
   const bw = (W - PAD.l - PAD.r) / months.length;
   const y = (v) => H - PAD.b - (v / ymax) * (H - PAD.t - PAD.b);
   const ticks = [0, ymax / 2, ymax];
-  const barW = Math.max(4, Math.min(28, bw - 2));
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ausgaben pro Monat">
+  const barW = Math.max(4, Math.min(28, bw - 6));
+  const rund = (x0, x1, top, unten, r) => `M${x0},${unten} V${top + r} Q${x0},${top} ${x0 + r},${top} H${x1 - r} Q${x1},${top} ${x1},${top + r} V${unten} Z`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ausgaben und Ersparnis pro Monat">
     ${ticks.map((t) => `<line class="grid" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${PAD.l - 8}" y="${y(t) + 4}" text-anchor="end">${eur0(t)}</text>`).join('')}
     ${months.map((o, i) => {
       const cx = PAD.l + bw * i + bw / 2;
-      const h = Math.max(0, y(0) - y(o.sum));
-      const r = Math.min(4, h / 2, barW / 2);
-      const top = y(o.sum);
-      const bar = h > 0 ? `<path class="bar" d="M${cx - barW / 2},${y(0)} V${top + r} Q${cx - barW / 2},${top} ${cx - barW / 2 + r},${top} H${cx + barW / 2 - r} Q${cx + barW / 2},${top} ${cx + barW / 2},${top + r} V${y(0)} Z"/>` : '';
+      const x0 = cx - barW / 2, x1 = cx + barW / 2;
+      const yBez = y(o.sum), yGes = y(o.sum + o.gespart);
+      const r = Math.min(4, barW / 2);
+      let bars = '';
+      if (o.gespart > 0) {
+        bars += `<rect class="bar" x="${x0}" y="${yBez}" width="${barW}" height="${Math.max(0, y(0) - yBez)}"/>`;
+        bars += `<path class="bar bar--gespart" d="${rund(x0, x1, yGes, yBez - 1.5, Math.min(r, (yBez - yGes) / 2))}"/>`;
+      } else if (o.sum > 0) {
+        bars += `<path class="bar" d="${rund(x0, x1, yBez, y(0), Math.min(r, (y(0) - yBez) / 2))}"/>`;
+      }
       const label = months.length <= 13 || i % 2 === 0 ? `<text x="${cx}" y="${H - 8}" text-anchor="middle">${o.d.toLocaleDateString('de-DE', { month: 'short' }).replace('.', '')}</text>` : '';
-      return `<g data-tip="${esc(`${o.d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}<br>${eur(o.sum)} · ${o.n} ${o.n === 1 ? 'Fahrt' : 'Fahrten'}`)}"><rect class="hit" x="${cx - bw / 2}" y="${PAD.t}" width="${bw}" height="${H - PAD.t - PAD.b}"/>${bar}</g>${label}`;
+      return `<g data-tip="${esc(`${o.d.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}<br>${eur(o.sum)} bezahlt · ${o.n} ${o.n === 1 ? 'Fahrt' : 'Fahrten'}${o.gespart ? `<br>${eur(o.gespart)} durch BahnCard gespart` : ''}`)}"><rect class="hit" x="${cx - bw / 2}" y="${PAD.t}" width="${bw}" height="${H - PAD.t - PAD.b}"/>${bars}</g>${label}`;
     }).join('')}
     <line class="axis" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(0)}" y2="${y(0)}"/>
   </svg>`;
