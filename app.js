@@ -104,6 +104,23 @@ function startImport() {
 // ---------------------------------------------------------------------------
 // Browser-Erweiterung (optional): meldet sich per postMessage aus ihrem Content-Script auf dieser Seite.
 // ---------------------------------------------------------------------------
+// Hero: die Kartennummer wechselt alle paar Sekunden 25 → 50 → 100
+function setupWechsel() {
+  const el = $('#wechsel');
+  if (!el) return;
+  const werte = ['25', '50', '100'];
+  let i = 0;
+  setInterval(() => {
+    el.classList.add('is-raus');
+    setTimeout(() => {
+      i = (i + 1) % werte.length;
+      el.textContent = werte[i];
+      el.classList.replace('is-raus', 'is-rein');
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('is-rein')));
+    }, 250);
+  }, 2600);
+}
+
 function setupErweiterung() {
   window.addEventListener('message', (e) => {
     if (e.source !== window || !e.data || e.data.quelle !== 'bc-erweiterung') return;
@@ -487,7 +504,13 @@ function chartKurve(kurve, von, bis, preis, heute) {
     <path class="line" d="${path}"/>
     <line class="ref" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(preis)}" y2="${y(preis)}"/>
     <text class="ref-label" x="${W - PAD.r}" y="${y(preis) - 6}" text-anchor="end">Kartenpreis ${eur(preis)}</text>
-    ${kurve.map((p) => `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><circle class="hit" cx="${x(p.datum)}" cy="${y(p.kum)}" r="12"/><circle class="dot" cx="${x(p.datum)}" cy="${y(p.kum)}" r="4"/></g>`).join('')}
+    ${kurve.map((p, i) => {
+      // Trefferfläche: senkrechter Streifen bis zur Mitte zwischen den Nachbarpunkten, über die ganze Höhe
+      const px = x(p.datum);
+      const links = i ? (x(kurve[i - 1].datum) + px) / 2 : Math.max(PAD.l, px - 12);
+      const rechts = i < kurve.length - 1 ? (px + x(kurve[i + 1].datum)) / 2 : Math.min(W - PAD.r, px + 12);
+      return `<g data-tip="${esc(`${datum(p.datum)}: ${kurzName(p.von)} → ${kurzName(p.nach)}<br>Ersparnis ${eur(p.ersparnis)} · gesamt ${eur(p.kum)}`)}"><rect class="hit" x="${links}" y="${PAD.t}" width="${Math.max(rechts - links, 1)}" height="${H - PAD.t - PAD.b}"/><line class="guide" x1="${px}" x2="${px}" y1="${PAD.t}" y2="${H - PAD.b}"/><circle class="dot" cx="${px}" cy="${y(p.kum)}" r="4"/></g>`;
+    }).join('')}
     <line class="axis" x1="${PAD.l}" x2="${W - PAD.r}" y1="${y(0)}" y2="${y(0)}"/>
   </svg>`;
 }
@@ -619,6 +642,7 @@ $('#file-input').addEventListener('change', async (e) => {
 
 setupBookmarklet();
 setupErweiterung();
+setupWechsel();
 
 if (location.hash === '#import') {
   startImport();

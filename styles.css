@@ -109,6 +109,10 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .eyebrow {
   margin: 0 0 16px; font: 600 var(--t-meta)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--verkehrsrot-text);
 }
+/* Hero: wechselnde Kartennummer */
+.wechsel { display: inline-block; font-variant-numeric: tabular-nums; transition: opacity 250ms var(--ease), transform 250ms var(--ease); }
+.wechsel.is-raus { opacity: 0; transform: translateY(-.25em); }
+.wechsel.is-rein { opacity: 0; transform: translateY(.25em); transition: none; }
 .display {
   font-family: var(--font-display); font-stretch: 78%; font-weight: 800;
   font-size: var(--t-display); line-height: .98; letter-spacing: -.02em; margin-bottom: 24px;
@@ -304,6 +308,9 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 .chart .bar--gespart { fill: var(--signalgruen); }
 .chart g:hover .bar { opacity: .82; }
 .chart .hit { fill: transparent; }
+.chart .guide { stroke: var(--kante-stark); stroke-width: 1; opacity: 0; }
+.chart g:hover .guide { opacity: 1; }
+.chart g:hover .dot { r: 6px; }
 .chart .today { stroke: var(--tinte-3); stroke-width: 1; stroke-dasharray: 2 4; }
 .legend { display: flex; gap: 20px; flex-wrap: wrap; font-size: var(--t-meta); color: var(--tinte-2); margin-top: 14px; }
 .legend i { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 8px; background: var(--signalgruen); }
@@ -417,5 +424,6 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bc__fill { transition: none; }
+  .wechsel { transition: none; }
   .bc--loading .bc__fill { animation: none; transform: scaleX(.5); }
 }

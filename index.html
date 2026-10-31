@@ -7,7 +7,7 @@
   <meta name="description" content="Prüfe in einer Minute, ob sich deine BahnCard gelohnt hat – mit deinen echten Reisedaten von bahn.de. Alles bleibt in deinem Browser.">
   <link rel="icon" href="extension/icons/icon32.png">
   <link rel="preload" href="fonts/archivo-wdth.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <header class="top">
@@ -30,8 +30,7 @@
     <section id="view-start">
       <div class="wrap hero">
         <div class="hero__text">
-          <p class="eyebrow">Für BahnCard 25, 50 und 100</p>
-          <h1 class="display">Hat sich deine BahnCard gelohnt?</h1>
+          <h1 class="display" aria-label="Hat sich deine BahnCard gelohnt?">Hat sich deine BahnCard <span class="wechsel" id="wechsel" aria-hidden="true">25</span> gelohnt?</h1>
           <p class="lead">Mit deinen echten Fahrten von bahn.de: Ersparnis, Break-even und welche Karte besser gepasst hätte.</p>
 
           <div class="hero__actions">
@@ -146,6 +145,6 @@
   </footer>
 
   <div class="tooltip hidden" id="tooltip" role="tooltip"></div>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
