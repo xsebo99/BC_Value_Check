@@ -1,11 +1,11 @@
-# Chrome Web Store – Einreichung „BahnCard-Bilanz“
+# Chrome Web Store – Einreichung „SparSchiene“
 
 Alles, was beim Einreichen im [Developer Dashboard](https://chrome.google.com/webstore/devconsole) abgefragt wird, zum Kopieren.
-ZIP bauen: `node tools/build-extension.mjs` → `dist/bahncard-bilanz-<version>.zip`
+ZIP bauen: `node tools/build-extension.mjs` → `dist/sparschiene-<version>.zip`
 
 ## Store-Eintrag
 
-**Name:** BahnCard-Bilanz
+**Name:** SparSchiene
 
 **Kurzbeschreibung** (max. 132 Zeichen, steht schon im Manifest):
 > Prüft mit deinen echten bahn.de-Fahrten, ob sich deine BahnCard gelohnt hat. Liest nur, nichts verlässt deinen Browser.
@@ -15,7 +15,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/bahncard-bilanz-<version>.
 
 **Ausführliche Beschreibung:**
 
-> Hat sich deine BahnCard gelohnt? BahnCard-Bilanz rechnet es mit deinen echten Fahrten von bahn.de nach – mit einem Klick.
+> Hat sich deine BahnCard gelohnt? SparSchiene rechnet es mit deinen echten Fahrten von bahn.de nach – mit einem Klick.
 >
 > So funktioniert's:
 > 1. Öffne https://xsebo99.github.io/BC_Value_Check/ und klicke auf „Meine Fahrten von bahn.de holen“.
@@ -34,7 +34,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/bahncard-bilanz-<version>.
 > • Die Erweiterung liest nur und ändert nichts an deinen Buchungen.
 > • Quellcode: https://github.com/xsebo99/BC_Value_Check
 >
-> BahnCard-Bilanz ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.
+> SparSchiene ist ein unabhängiges Projekt und steht in keiner Verbindung zur Deutschen Bahn AG. „BahnCard“ und „Deutsche Bahn“ sind Marken der Deutsche Bahn AG.
 
 **Website:** https://xsebo99.github.io/BC_Value_Check/
 **Support-URL:** https://github.com/xsebo99/BC_Value_Check/issues
@@ -50,7 +50,7 @@ ZIP bauen: `node tools/build-extension.mjs` → `dist/bahncard-bilanz-<version>.
 ## Datenschutz-Tab
 
 **Alleiniger Zweck (Single purpose):**
-> Liest auf Wunsch des Nutzers seine BahnCard und vergangenen Bahnbuchungen aus seinem bahn.de-Konto und übergibt sie an die Webseite BahnCard-Bilanz, die im Browser berechnet, ob sich die BahnCard gelohnt hat.
+> Liest auf Wunsch des Nutzers seine BahnCard und vergangenen Bahnbuchungen aus seinem bahn.de-Konto und übergibt sie an die Webseite SparSchiene, die im Browser berechnet, ob sich die BahnCard gelohnt hat.
 
 **Begründung je Berechtigung:**
 

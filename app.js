@@ -4,7 +4,7 @@
 // Konstanten
 // ---------------------------------------------------------------------------
 const BAHN_ORIGIN = 'https://www.bahn.de';
-const STORE_KEY = 'bahncard-bilanz-daten';
+const STORE_KEY = 'sparschiene-daten';
 
 // Listenpreise laut bahn.de, Stand Oktober 2026 (2. Klasse). In der Auswertung änderbar.
 const LISTENPREIS = { BC25: 62.90, MYBC25: 39.90, BC50: 244, BC100: 4899 };
