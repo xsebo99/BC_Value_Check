@@ -728,7 +728,7 @@ function render() {
       </tr>`).join('') || '<tr><td colspan="5" class="muted">Keine Fahrten in diesem Zeitraum.</td></tr>'}</tbody>
     </table></div>
   </details>
-  <p class="stand">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Beispieldaten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p>
+  <p class="stand">Stand: ${datum(d.abgerufen)} · ${d.demo ? 'Demo-Daten' : 'Daten von bahn.de'} · stornierte Fahrten ausgeblendet</p>
   </div>`;
 
   const root = $('#view-result');
