@@ -312,11 +312,13 @@ kbd { background: var(--fahrkarte); border: 1px solid var(--kante); border-botto
 @keyframes laden { 0% { --fill: .05; } 50% { --fill: .8; } 100% { --fill: .05; } }
 
 /* Schritte */
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
-.steps li { border-top: 2px solid var(--tinte); padding-top: 20px; }
-.steps__n { display: block; font: 800 2.4rem/1 var(--font-display); font-stretch: 72%; color: var(--verkehrsrot); margin-bottom: 14px; }
-.steps h3 { font: 700 var(--t-h3)/1.25 var(--font-text); margin-bottom: 8px; }
-.steps p { margin-bottom: 12px; }
+/* Animation links (loop.css), echter Lesezeichen-Button rechts */
+.howto { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.howto__side { display: grid; justify-items: start; gap: 4px; }
+.howto__label { margin: 0 0 8px; font: 600 var(--t-meta)/1 var(--font-text); letter-spacing: .1em; text-transform: uppercase; color: var(--tinte-3); }
+.howto__side #bookmarklet-hint { margin-bottom: 8px; }
+.howto__steps { margin: 0; padding: 16px 0 0 20px; border-top: 1px solid var(--kante); justify-self: stretch; display: grid; gap: 6px; font-size: var(--t-klein); }
+.howto__steps li::marker { font-family: var(--font-display); font-weight: 700; color: var(--verkehrsrot-text); }
 .bookmarklet {
   display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 12px;
   background: var(--verkehrsrot); color: #fff; text-decoration: none; font-weight: 600; font-size: .95rem;
@@ -520,7 +522,7 @@ tbody tr:last-child td { border-bottom: 0; }
   .hero__tilt { max-width: 380px; transform: rotate(-3deg); }
   .verdict .bc { margin: 0 auto; }
   .compare { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .steps { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .howto { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .aside-row { grid-template-columns: minmax(0, 1fr); }
   .upload { justify-content: flex-start; text-align: left; }
 }
