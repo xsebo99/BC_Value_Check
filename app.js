@@ -60,7 +60,7 @@ async function setupBookmarklet() {
   const link = $('#bookmarklet');
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Zieh den Button in deine Lesezeichenleiste und klick ihn dann auf bahn.de an.');
+    alert('Zieh den Button in deine Lesezeichenleiste und klick ihn dann dort an.');
   });
   if (location.protocol === 'file:') {
     $('#bookmarklet-hint').textContent = 'Hinweis: Die Seite muss über http(s) laufen (nicht als Datei geöffnet), damit das Lesezeichen funktioniert.';

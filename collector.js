@@ -8,8 +8,11 @@ void (async () => {
   const SITE_ORIGIN = new URL(SITE).origin;
   /*__CORE__*/
 
+  // Nicht auf bahn.de: „Meine Reisen“ in einem neuen Tab öffnen, dort klickt man das Lesezeichen noch einmal.
+  // Code in einen anderen Tab schicken erlaubt der Browser nicht, daher geht es nicht in einem Schritt.
   if (location.hostname !== 'www.bahn.de') {
-    alert('Bahnkarte24: Bitte öffne zuerst www.bahn.de, melde dich an und klicke dann erneut auf das Lesezeichen.');
+    const tab = window.open('https://www.bahn.de/buchung/reiseuebersicht/vergangene', '_blank');
+    if (!tab) alert('Bahnkarte24: Bitte öffne www.bahn.de, melde dich an und klicke dann erneut auf das Lesezeichen.');
     return;
   }
   let token;
